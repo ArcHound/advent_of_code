@@ -5,7 +5,7 @@ Python3 tool for Advent of Code
 
  - prepare the files with solution and tests
  - date sanity checks, defaults to today
- - automatically fetch the input given the AoC year and day
+ - automatically fetch the input given the AoC year and day (you'd need the token, see [here](https://github.com/wimglenn/advent-of-code-wim/issues/1)).
  - logging and custom lib organization
  - built-in profiler
  - very much WIP

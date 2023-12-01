@@ -1,6 +1,8 @@
 Python3 tool for Advent of Code
 ===============================
 
+[![works badge](https://cdn.jsdelivr.net/gh/nikku/works-on-my-machine@v0.2.0/badge.svg)](https://github.com/nikku/works-on-my-machine)
+
  - prepare the files with solution and tests
  - date sanity checks, defaults to today
  - automatically fetch the input given the AoC year and day

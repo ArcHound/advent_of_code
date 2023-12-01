@@ -13,6 +13,7 @@ Install
 -------
 
     git clone https://github.com/ArcHound/advent_of_code
+    cd advent_of_code
     python3 -m venv venv
     source venv/bin/activate
     pip3 install -r requirements.txt

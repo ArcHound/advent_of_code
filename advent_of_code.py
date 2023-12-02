@@ -209,17 +209,18 @@ import pytest
 
 from aoc.year{}.day{} import part1, part2
 
-in_data = \"\"\"
+in_data1 = \"\"\"
 \"\"\"
-
 part1_ans = \"part1 output {}\"
-part2_ans = \"part2 output {}\"
 
 def test_part1():
-    assert str(part1(in_data)) == part1_ans
+    assert str(part1(in_data1)) == part1_ans
+
+in_data2 = in_data1
+part2_ans = \"part2 output {}\"
 
 def test_part2():
-    assert str(part2(in_data)) == part2_ans
+    assert str(part2(in_data2)) == part2_ans
         
         
 """.format(

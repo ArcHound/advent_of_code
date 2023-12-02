@@ -25,11 +25,11 @@ def parse(in_data):
                 colors[c]+=b
             rounds.append(colors)
         games.append(Game(g_id=g_id, rounds=rounds))
+    log.debug(games)
     return games
 
 def possible_game(game):
     cond = {"red":12, "green":13, "blue":14}
-)
     return False not in [max([r[color] for r in game.rounds])<=cond[color] for color in cond]
 
 def power_of_game(game):

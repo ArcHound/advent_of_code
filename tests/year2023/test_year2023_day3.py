@@ -17,13 +17,14 @@ in_data1 = """467..114..
 """
 part1_ans = "4361"
 
+
 def test_part1():
     assert str(part1(in_data1)) == part1_ans
+
 
 in_data2 = in_data1
 part2_ans = "467835"
 
+
 def test_part2():
     assert str(part2(in_data2)) == part2_ans
-        
-        

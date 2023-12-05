@@ -13,13 +13,14 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 """
 part1_ans = "13"
 
+
 def test_part1():
     assert str(part1(in_data1)) == part1_ans
+
 
 in_data2 = in_data1
 part2_ans = "30"
 
+
 def test_part2():
     assert str(part2(in_data2)) == part2_ans
-        
-        

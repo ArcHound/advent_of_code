@@ -2,7 +2,7 @@
 import logging
 from copy import deepcopy
 
-from lib import vector2d
+from aoc_lib import vector2d
 
 log = logging.getLogger("aoc_logger")
 

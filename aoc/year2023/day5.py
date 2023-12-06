@@ -29,6 +29,7 @@ states = [
 
 
 def parse_data(in_data):
+    # technique: get all of the data in some dict form
     state = states[0]
     output = defaultdict(list)
     num_struct = list()
@@ -44,7 +45,7 @@ def parse_data(in_data):
             if line == "":
                 state_pointer += 1
                 continue
-            num_struct.append(
+            num_struct.append( # could have used a dataclass
                 {
                     "source": int(line.split(" ")[1]),
                     "target": int(line.split(" ")[0]),
@@ -72,12 +73,15 @@ def part1(in_data):
     ]
     data = parse_data(in_data)
     output = dict()
+    # for each seed number
     for seed in data["seeds"]:
         step = seed
+        # go through the mappings
         for state in states:
             log.debug(state)
             log.debug(step)
             mapped = False
+            # find the applicable interval if it's special
             for entry in data[state]:
                 if step >= entry["source"] and step < entry["source"] + entry["len"]:
                     log.debug(entry)
@@ -86,15 +90,16 @@ def part1(in_data):
                     mapped = True
                     break
             if not mapped:
-                pass  # nothing to do
+                pass  # if not, it's 1:1 - nothing to do
             log.debug(step)
             log.debug("-------------")
         output[step] = seed
     log.debug(output)
-    return min([k for k in output])
+    return min([k for k in output]) # minimum key is our answer
 
 
 def parse_data2(in_data):
+    # I know copying and pasting is wrong, but it's fast
     state = states[0]
     output = defaultdict(list)
     num_struct = list()
@@ -106,6 +111,7 @@ def parse_data2(in_data):
             start = 0
             rang = 0
             seeds = list()
+            # simple state machine to alternate numbers for interpretation
             for n in [int(num) for num in line.split(":")[1].split(" ") if num != ""]:
                 if switch == 0:
                     start = n
@@ -136,21 +142,8 @@ def parse_data2(in_data):
     return output
 
 
-def pass_function(seed, data):
-    step = seed
-    for state in data:
-        mapped = False
-        for entry in state:
-            if step >= entry[0] and step < entry[0] + entry[1]:
-                log.debug(entry)
-                map_i = step - entry[0]
-                step = entry[2] + map_i
-                mapped = True
-                break
-    return step
-
-
 def part2(in_data):
+    # the issue with the above approach is that it's slow for many seeds, so we're properly working with intervals now
     states = [
         "seed-to-soil",
         "soil-to-fertilizer",
@@ -165,18 +158,22 @@ def part2(in_data):
     interval_map = dict()
     intervals = list()
     seeds = list()
+    # the intervals that contain seeds are good, intervals without them are bad. 
     for entry in data["seeds"]:
         seeds.append(
             Interval(entry["start"], entry["start"] + entry["len"] - 1, "good")
         )
+    # for the alg to work, we need to have a complete partition of the space which is (0,inf)
     n_seeds = Interval.fill_holes(Interval.normalize(seeds))
     log.debug("seeds")
     log.debug(seeds)
     log.debug(n_seeds)
 
     translated = n_seeds
+    # We'll be translating the intervals and keeping track whether the images contain seeds (good intervals)
     for state in states:
         log.debug(state)
+        # encompass the full space, fill holes of intervals and extend from 0 to inf 
         n_source_intervals = Interval.fill_holes(
             Interval.normalize(
                 [
@@ -189,6 +186,19 @@ def part2(in_data):
             Interval(entry["source"], entry["source"] + entry["len"] - 1)
             for entry in data[state]
         ]
+        # we'll have a set of intervals from the previous step noting good and bad intervals and the mapping.
+        # the mapping source is a set of intervals too
+        # to translate our labeled intervals we need to know which parts are displayed where
+        # but it might happen that one interval with labels might be displayed to two disjoint intervals (and other such cases)
+        # the idea is to produce a "least common intervals" set:
+        # set of intervals that for each element we can decide how it's displayed and whether it's good.
+        # surprisingly hard to talk about this, here's a picture:
+        # |           Good      | Bad | Good    | Bad       |
+        # | maps 1:1 | maps to +x | maps 1:1   | maps to -x | 
+        # the least common intervals would return:
+        # |          |          | |   |        | |          |
+        # so we know that first interval is good and maps 1:1, second is also good and maps to +x, third is bad and maps to +x, fourth is bad and maps 1:1, fifth is good and maps to 1:1, next is good and maps to -x and the rest is bad and maps to -x.
+        # then we can just switch the starts and ends of mapped intervals and we've retained the information
         olaps = Interval.least_common_intervals(translated, n_source_intervals)
         Interval.label_mask(olaps, translated)
         log.debug("translate")
@@ -215,5 +225,6 @@ def part2(in_data):
         log.debug(translated)
         log.debug("-------------------")
 
+    # since we know where the seeds are, we are looking for a minimal start of an interval. That's the global minimum as the mappings keep the direction ( (0,5) -> (5,10) never (0,5) -> (10,5) )
     output = min([x.start for x in translated if x.label == "good"])
     return output

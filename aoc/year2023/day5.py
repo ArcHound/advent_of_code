@@ -45,7 +45,7 @@ def parse_data(in_data):
             if line == "":
                 state_pointer += 1
                 continue
-            num_struct.append( # could have used a dataclass
+            num_struct.append(  # could have used a dataclass
                 {
                     "source": int(line.split(" ")[1]),
                     "target": int(line.split(" ")[0]),
@@ -95,7 +95,7 @@ def part1(in_data):
             log.debug("-------------")
         output[step] = seed
     log.debug(output)
-    return min([k for k in output]) # minimum key is our answer
+    return min([k for k in output])  # minimum key is our answer
 
 
 def parse_data2(in_data):
@@ -158,7 +158,7 @@ def part2(in_data):
     interval_map = dict()
     intervals = list()
     seeds = list()
-    # the intervals that contain seeds are good, intervals without them are bad. 
+    # the intervals that contain seeds are good, intervals without them are bad.
     for entry in data["seeds"]:
         seeds.append(
             Interval(entry["start"], entry["start"] + entry["len"] - 1, "good")
@@ -173,7 +173,7 @@ def part2(in_data):
     # We'll be translating the intervals and keeping track whether the images contain seeds (good intervals)
     for state in states:
         log.debug(state)
-        # encompass the full space, fill holes of intervals and extend from 0 to inf 
+        # encompass the full space, fill holes of intervals and extend from 0 to inf
         n_source_intervals = Interval.fill_holes(
             Interval.normalize(
                 [
@@ -194,7 +194,7 @@ def part2(in_data):
         # set of intervals that for each element we can decide how it's displayed and whether it's good.
         # surprisingly hard to talk about this, here's a picture:
         # |           Good      | Bad | Good    | Bad       |
-        # | maps 1:1 | maps to +x | maps 1:1   | maps to -x | 
+        # | maps 1:1 | maps to +x | maps 1:1   | maps to -x |
         # the least common intervals would return:
         # |          |          | |   |        | |          |
         # so we know that first interval is good and maps 1:1, second is also good and maps to +x, third is bad and maps to +x, fourth is bad and maps 1:1, fifth is good and maps to 1:1, next is good and maps to -x and the rest is bad and maps to -x.

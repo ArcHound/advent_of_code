@@ -5,7 +5,6 @@ from collections import defaultdict
 log = logging.getLogger("aoc_logger")
 
 
-
 def parse(in_data):
     # order of the symbol cards
     translate = {"T": "B", "J": "C", "Q": "D", "K": "E", "A": "F"}
@@ -62,8 +61,6 @@ def part1(in_data):
     for i in range(len(sorted_vals)):
         count += (i + 1) * sorted_vals[i][1]
     return count
-
-
 
 
 def parse2(in_data):

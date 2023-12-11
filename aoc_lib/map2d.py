@@ -202,3 +202,12 @@ class Map2d:
             for x in range(len(self.flooded))
             if self.flooded[x] == max_val
         }, max_val
+
+    def invert_obstacles(self):
+        new_obst_str = ""
+        for c in self.obstacle_str:
+            if c == Map2d.obstacle_sym:
+                new_obst_str += Map2d.empty_sym
+            else:
+                new_obst_str += Map2d.obstacle_sym
+        self.obstacle_str = new_obst_str

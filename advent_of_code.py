@@ -367,6 +367,7 @@ def solve(
             log.critical(f"Solution for {year}, day {day} part {part} not implemented!")
         except Exception as e:
             log.critical(str(e))
+            raise e
 
     return 0
 

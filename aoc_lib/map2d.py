@@ -100,6 +100,9 @@ class Map2d:
             index // self.x_len + self.minimal[1],
         )
 
+    def get_obstacle_from_point(self, point):
+        return self.obstacle_str[self.translate_coordinates(point)]
+
     @classmethod
     def empties_to_obstacles(cls, empties, bounds):
         return [
@@ -211,3 +214,47 @@ class Map2d:
             else:
                 new_obst_str += Map2d.obstacle_sym
         self.obstacle_str = new_obst_str
+
+    def invert_point(self, point):
+        new_c = ""
+        i = self.translate_coordinates(point)
+        if self.obstacle_str[i] == Map2d.obstacle_sym:
+            new_c = Map2d.empty_sym
+        else:
+            new_c = Map2d.obstacle_sym
+        self.obstacle_str = self.obstacle_str[:i] + new_c + self.obstacle_str[i + 1 :]
+
+    def find_reflection_axes(self):
+        # horizontal
+        h_axis = None
+        for j in range(1, self.y_len):
+            match = True
+            for k in range(1, min([j, self.y_len - j]) + 1):
+                for i in range(0, self.x_len):
+                    if self.get_obstacle_from_point(
+                        (i, j + k - 1)
+                    ) != self.get_obstacle_from_point((i, j - k)):
+                        match = False
+                        break
+                if not match:
+                    break
+            if match:
+                h_axis = j
+                break
+        # vertical
+        v_axis = None
+        for i in range(1, self.x_len):
+            match = True
+            for k in range(1, min([i, self.x_len - i]) + 1):
+                for j in range(0, self.y_len):
+                    if self.get_obstacle_from_point(
+                        (i + k - 1, j)
+                    ) != self.get_obstacle_from_point((i - k, j)):
+                        match = False
+                        break
+                if not match:
+                    break
+            if match:
+                v_axis = i
+                break
+        return h_axis, v_axis

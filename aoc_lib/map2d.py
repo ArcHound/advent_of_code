@@ -121,7 +121,7 @@ class Map2d:
         )
 
     def in_bounds_index(self, index):
-        return index >= 0 and index < self.x_len * self.y_len
+        return index >= 0 and index < len(self.obstacle_str)
 
     # can't see points out of bounds
     def nearby_points(self, point):

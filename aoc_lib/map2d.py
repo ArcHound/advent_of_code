@@ -66,6 +66,7 @@ class PipeMap2d:
 class Map2d:
     obstacle_sym = "#"
     empty_sym = "."
+    obj_sym = "O"
 
     @classmethod
     def from_obstacle_list(cls, obstacles, bounds, diagonal=False):
@@ -90,6 +91,16 @@ class Map2d:
                 f"Bounds {bounds} cannot be mapped onto str of len {len(obstacle_str)}"
             )
         self.flooded = list(self.x_len * self.y_len * [-1])
+
+    def __eq__(self, other):
+        return (
+            self.obstacle_str == other.obstacle_str
+            and self.x_len == other.x_len
+            and self.y_len == other.y_len
+        )
+
+    def __str__(self):
+        return self.debug_draw()
 
     def translate_coordinates(self, point):
         return (point[1] - self.minimal[1]) * self.x_len + (point[0] - self.minimal[0])
@@ -172,7 +183,7 @@ class Map2d:
                     else:
                         drawing += "+"
                 else:
-                    drawing += Map2d.empty_sym
+                    drawing += self.obstacle_str[self.translate_coordinates((i, j))]
             drawing += "\n"
         return drawing
 
@@ -223,6 +234,11 @@ class Map2d:
         else:
             new_c = Map2d.obstacle_sym
         self.obstacle_str = self.obstacle_str[:i] + new_c + self.obstacle_str[i + 1 :]
+
+    def set_point(self, point, val):
+        new_c = ""
+        i = self.translate_coordinates(point)
+        self.obstacle_str = self.obstacle_str[:i] + val + self.obstacle_str[i + 1 :]
 
     def find_reflection_axes(self):
         # horizontal

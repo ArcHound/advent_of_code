@@ -53,6 +53,74 @@ def test_init_ex():
             )
 
 
+def test_eq():
+    cases = [
+        {
+            "label": "simple eq",
+            "init": {
+                "obstacle_str": "..........#......#......#...........",
+                "bounds": ((0, 0), (6, 6)),
+            },
+            "input": {
+                "obstacle_str": "..........#......#......#...........",
+                "bounds": ((0, 0), (6, 6)),
+            },
+            "output": True,
+            "ex": None,
+        },
+        {
+            "label": "simple neq",
+            "init": {
+                "obstacle_str": "..........#......#......#...........",
+                "bounds": ((0, 0), (6, 6)),
+            },
+            "input": {
+                "obstacle_str": "#...",
+                "bounds": ((0, 0), (2, 2)),
+            },
+            "output": False,
+            "ex": None,
+        },
+        {
+            "label": "neq content with matching bounds",
+            "init": {
+                "obstacle_str": ".........#......#......#............",
+                "bounds": ((0, 0), (6, 6)),
+            },
+            "input": {
+                "obstacle_str": "..........###....#......#...........",
+                "bounds": ((0, 0), (6, 6)),
+            },
+            "output": False,
+            "ex": None,
+        },
+        {
+            "label": "eq content with mismatching bounds",
+            "init": {
+                "obstacle_str": ".........#......#......#............",
+                "bounds": ((0, 0), (9, 4)),
+            },
+            "input": {
+                "obstacle_str": ".........#......#......#............",
+                "bounds": ((0, 0), (6, 6)),
+            },
+            "output": False,
+            "ex": None,
+        },
+    ]
+    for case in cases:
+        try:
+            obj = Map2d(**case["init"])
+            output = obj == Map2d(**case["input"])
+            assert output == case["output"], "case '{}', output: exp {}, got {}".format(
+                case["label"], case["output"], output
+            )
+        except Exception as e:
+            assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
+                case["label"], case["ex"], type(e)
+            )
+
+
 def test_translate_coordinates():
     cases = [
         {

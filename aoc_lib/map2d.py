@@ -79,6 +79,18 @@ class Map2d:
                     obstacle_str += Map2d.empty_sym
         return cls(obstacle_str, bounds, diagonal)
 
+    @classmethod
+    def from_lines(cls, in_data, diagonal=False):
+        buf = ""
+        x_len = 0
+        y_len = 0
+        for line in in_data.splitlines():
+            if line != "":
+                buf += line.strip()
+                y_len += 1
+                x_len = len(line.strip())
+        return cls(buf, ((0, 0), (x_len, y_len)))
+
     def __init__(self, obstacle_str, bounds=((0, 0), (200, 200)), diagonal=False):
         self.obstacle_str = obstacle_str
         self.diagonal = diagonal

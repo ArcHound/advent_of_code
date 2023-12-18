@@ -81,6 +81,39 @@ def test_v_abs_val():
             )
 
 
+def test_v_const_mult():
+    cases = [
+        {
+            "label": "simple",
+            "input": {"a": (0, 1), "c": 3},
+            "output": (0, 3),
+            "ex": None,
+        },
+        {
+            "label": "neg",
+            "input": {"a": (0, 4), "c": -1},
+            "output": (0, -4),
+            "ex": None,
+        },
+        {
+            "label": "combo",
+            "input": {"a": (4, -2), "c": -2},
+            "output": (-8, 4),
+            "ex": None,
+        },
+    ]
+    for case in cases:
+        try:
+            output = v_const_mult(**case["input"])
+            assert output == case["output"], "case '{}', output: exp {}, got {}".format(
+                case["label"], case["output"], output
+            )
+        except Exception as e:
+            assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
+                case["label"], case["ex"], type(e)
+            )
+
+
 def test_v_abs():
     cases = [
         {

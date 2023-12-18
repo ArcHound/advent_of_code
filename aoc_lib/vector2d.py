@@ -13,6 +13,10 @@ def v_abs_val(a):
     return abs(a[0]) + abs(a[1])
 
 
+def v_const_mult(a, c):
+    return (a[0] * c, a[1] * c)
+
+
 def v_abs(a):
     return (abs(a[0]), abs(a[1]))
 

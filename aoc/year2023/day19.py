@@ -86,12 +86,14 @@ def part1(in_data):
 
 def interval_rule(interval, key, sym, val, next_val):
     if sym == ">":  # we have two symbols
-        if val >= interval.start and val < interval.end:
+        if (
+            val >= interval.start and val < interval.end
+        ):  # if the val is in the interval, tear it apart
             return [
                 (Interval(interval.start, val + 1), None),
                 (Interval(val + 1, interval.end), next_val),
             ]
-        elif val >= interval.end:
+        elif val >= interval.end:  # else it missed, whole interval is ok or not
             return [(Interval(interval.start, interval.end), None)]
         elif val < interval.start:
             return [(Interval(interval.start, interval.end), next_val)]
@@ -108,16 +110,18 @@ def interval_rule(interval, key, sym, val, next_val):
 
 
 def process_interval_obj(interval_obj, rules_map):
+    # checks one interval object
+    # could use a refactor
     log.debug(interval_obj)
     to_process = [interval_obj]
     result = list()
     done = False
-    ruleset = interval_obj["label"]
+    ruleset = interval_obj["label"]  # check the rule to evaluate
     to_process = [interval_obj]
     for rule in rules_map[ruleset]:
         new_process = list()
         log.debug(rule)
-        if rule["key"] is None:
+        if rule["key"] is None:  # last rule is globally applicable and final
             log.debug("Final - {}".format(rule["next_val"]))
             for p_int in to_process:
                 log.debug(p_int)
@@ -136,7 +140,11 @@ def process_interval_obj(interval_obj, rules_map):
                 p = p_int[key]
                 log.debug(p)
                 log.debug("HELP1")
-                for single_interval in p:
+                for (
+                    single_interval
+                ) in (
+                    p
+                ):  # take a look at the key and return all possible intervals for futher processing
                     log.debug("HELP2")
                     log.debug(single_interval)
                     ints = interval_rule(single_interval, **rule)
@@ -165,7 +173,7 @@ def process_interval_obj(interval_obj, rules_map):
     known = list()
     unknown = list()
     for i in result:
-        if i["label"] in "RA":
+        if i["label"] in "RA":  # if we reach A or R, we're done with the rule
             known.append(i)
         else:
             unknown.append(i)
@@ -178,7 +186,9 @@ def process_intervals(intervals, rules_map):
     result = list()
     i = 0
     while len(to_process) > 0:
-        ints = to_process.pop(0)
+        ints = to_process.pop(
+            0
+        )  # eval interval objects until we know the results (A or R)
         known, unknown = process_interval_obj(ints, rules_map)
         result += known
         to_process += unknown
@@ -221,7 +231,7 @@ def part2(in_data):
     ]
     new_ints = process_intervals(intervals, rules_map)
     count = 0
-    new_ints = [x for x in new_ints if x["label"] == "A"]
+    new_ints = [x for x in new_ints if x["label"] == "A"]  # only interested in accepted
     log.debug(pprint.pformat(new_ints))
     for x in new_ints:
         count += (

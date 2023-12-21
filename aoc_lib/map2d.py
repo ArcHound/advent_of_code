@@ -1,6 +1,10 @@
 from enum import Enum
 from dataclasses import dataclass
 
+import logging
+
+log = logging.getLogger("aoc_logger")
+
 
 class PipeType(Enum):
     TopLeft = "TopLeft"
@@ -217,6 +221,23 @@ class Map2d:
                     continue
                 self.flooded[p] = self.flooded[process] + 1
                 processing.append(p)
+
+    def iterative_flood_count(self, starting_point, steps):
+        starting_index = self.translate_coordinates(starting_point)
+        processing = [starting_index]
+        for i in range(steps):
+            new_processing = set()
+            for process in processing:
+                for p in self.nearby_indexes(process):
+                    if (
+                        not self.in_bounds_index(p)
+                        or self.obstacle_str[p] == Map2d.obstacle_sym
+                    ):
+                        continue
+                    else:
+                        new_processing.add(p)
+            processing = list(new_processing)
+        return len(processing)
 
     def clear_flood(self):
         self.flooded = list(self.x_len * self.y_len * [-1])

@@ -222,7 +222,7 @@ class Map2d:
                 self.flooded[p] = self.flooded[process] + 1
                 processing.append(p)
 
-    def iterative_flood_count(self, starting_point, steps):
+    def iterative_flood_indexes(self, starting_point, steps):
         starting_index = self.translate_coordinates(starting_point)
         processing = [starting_index]
         for i in range(steps):
@@ -237,7 +237,7 @@ class Map2d:
                     else:
                         new_processing.add(p)
             processing = list(new_processing)
-        return len(processing)
+        return processing
 
     def clear_flood(self):
         self.flooded = list(self.x_len * self.y_len * [-1])

@@ -41,9 +41,24 @@ def part2(in_data):
     #  - we gain one "diagonal" edge tile for each diagonal
     #  - we still have bottom edge tile, left edge tile, right edge tile and top edge tile WITH THE SAME COVERAGE
     #  - in the inner tiles, the parity of tiles flips. However, we gain 4*n inner tiles -> this is our biggest term
-    #  - there is no more funny business here
+    #    - we're actually always gaining new iet tiles (induction again, go reader!)
+    #    - to count all of the inner tiles, we can use the Gauss formula multiplied by four
+    #    - we need to split that count into total number of even tiles and total number of odd tiles
+    #    - to get the total number of even tiles, divide the n by 2 (=n_half), count the numbers up to n_half (Gauss again) and multiply by two -> you'll get n_half*(n_half+1)
+    #    - then we need to multiply that by 4 because directions -> n*(n+2)
+    #    - to get the odd numbers, subtract n_half from the even numbers (send 2 -> 1, 4 -> 3 etc) and multiply by 4 - formula is n*n
+    #    - those are the general formulas
+    #    - don't forget to subtract one for the outer layer in both cases
+    #    - (man, this proof is looking more rigid, but more messy)
+    #    - say that n+1 is odd, without loss of generality
+    #    - yes, there is more formal work for the opposite case (add n_half), but trust me bro
+    #    - old iet tiles -> n*n  (see above)
+    #    - old iot tiles are now iet tiles -> there were n*(n-2) of them (see above)
+    #    - flipping iet to iot yields n*n tiles
+    #    - flipping iot to iet and adding 4n tiles yields n*n -2n + 4n = n*(n+2)
+    #    - so this is a nice quadratic relation
+    #  - I'll say it, QED
     #
-    # Figuring out how the tiles flip and counting them is hard work
     # Since it seems to be a polynomial, we can try interpolating it using the Lagrange formula
     # we need to have points in the form of 65+k*131 though so that we stay on the grid
     # to do that, we need to extend our map to at least a 5x5 grid so we can take a look at 65, 131+65 and 2*131+65

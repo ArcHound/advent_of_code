@@ -56,7 +56,9 @@ def part1(in_data, test=False):
     # visual check - there should be two distinct groups (components)
     # nx.draw(new_g, with_labels=True, node_color="silver", node_size=700)
     # plt.show()
-    comps = [comp for comp in nx.connected_components(new_g)] # count the components in both graphs
+    comps = [
+        comp for comp in nx.connected_components(new_g)
+    ]  # count the components in both graphs
     # Can be done by BFS as well
     log.debug(comps)
     return len(comps[0]) * len(comps[1])

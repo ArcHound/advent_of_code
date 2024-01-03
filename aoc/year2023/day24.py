@@ -51,7 +51,7 @@ def vague_intersection(p_a, v_a, p_b, v_b, test_area):
                 and test_area[1][0] <= intersection.y
                 and intersection.y <= test_area[1][1]
             )
-    except np.linalg.LinAlgError as e: # if no solution, we don't have that collision
+    except np.linalg.LinAlgError as e:  # if no solution, we don't have that collision
         output = False
         log.debug(e)
     return output

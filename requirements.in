@@ -1,0 +1,11 @@
+click
+requests
+requests_cache
+bs4
+python-dotenv
+networkx
+z3-solver
+matplotlib
+pytest
+coverage
+tqdm

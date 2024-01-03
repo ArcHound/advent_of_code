@@ -19,6 +19,7 @@ import click
 from dotenv import load_dotenv
 import requests
 import requests_cache
+from bs4 import BeautifulSoup
 
 import aoc
 
@@ -184,10 +185,18 @@ import logging
 
 log = logging.getLogger(\"aoc_logger\")
 
+def parse_data(in_data):
+    data = list()
+    for line in in_data.splitlines():
+        data.append(line)
+    return data
+
 def part1(in_data):
+    data = parse_data(in_data)
     return \"part1 output {}\"
 
 def part2(in_data):
+    data = parse_data(in_data)
     return \"part2 output {}\"
 """.format(
                 slug, slug, slug
@@ -313,6 +322,14 @@ def test_part2():
     callback=validate_day,
 )
 @click.option(
+    "-s",
+    "--autosubmit",
+    default=False,
+    type=bool,
+    is_flag=True,
+    help="Submit the solution right away?",
+)
+@click.option(
     "--log-level",
     default="WARNING",
     type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]),
@@ -333,6 +350,7 @@ def solve(
     profiling_sort_key,
     year,
     day,
+    autosubmit,
     log_level,
 ):
     """Solve for the input of a given day"""
@@ -363,6 +381,20 @@ def solve(
             log.info(f"Solving {year}, day {day}, part {part}...")
             output = vars(solve_day)[f"part{part}"](data)
             click.echo(output)
+            send_it = False
+            if autosubmit:
+                send_it = True
+            else:
+                send_it = click.confirm(
+                    f"Send the answer {output} for {year}, day {day}, part {part}?"
+                )
+            if send_it:
+                resp = aoc_session.post(
+                    f"https://adventofcode.com/{year}/day/{day}/answer",
+                    data={"level": str(part), "answer": str(output)},
+                )
+                soup = BeautifulSoup(resp.text, "html.parser")
+                click.echo(soup.find("article").find("p").text)
         except ModuleNotFoundError as e:
             log.critical(f"Solution for {year}, day {day} part {part} not implemented!")
         except Exception as e:

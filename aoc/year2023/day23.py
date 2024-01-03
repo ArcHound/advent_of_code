@@ -73,7 +73,7 @@ def flood_edges(map2d, nodes, slippery=True):
                 ):
                     continue
                 elif (
-                    slippery # flag to ignore the slopes or not
+                    slippery  # flag to ignore the slopes or not
                     and (map2d.obstacle_str[process] in slope_dict)
                     and v_add(slope_dict[map2d.obstacle_str[process]], process_point)
                     != map2d.translate_index(p)

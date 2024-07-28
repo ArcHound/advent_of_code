@@ -14,6 +14,7 @@ import pstats
 import importlib
 import pkgutil
 import pathlib
+import re
 
 import click
 from dotenv import load_dotenv
@@ -24,7 +25,7 @@ from bs4 import BeautifulSoup
 import aoc
 
 requests_cache.install_cache(
-    cache_name="advent_of_code_requests_cache", backend="sqlite", expire_after=10800
+    cache_name="advent_of_code_requests_cache", backend="sqlite", cache_control=True 
 )
 
 load_dotenv()
@@ -191,11 +192,11 @@ def parse_data(in_data):
         data.append(line)
     return data
 
-def part1(in_data):
+def part1(in_data, test=False):
     data = parse_data(in_data)
     return \"part1 output {}\"
 
-def part2(in_data):
+def part2(in_data, test=False):
     data = parse_data(in_data)
     return \"part2 output {}\"
 """.format(
@@ -223,13 +224,13 @@ in_data1 = \"\"\"
 part1_ans = \"part1 output {}\"
 
 def test_part1():
-    assert str(part1(in_data1)) == part1_ans
+    assert str(part1(in_data1, True)) == part1_ans
 
 in_data2 = in_data1
 part2_ans = \"part2 output {}\"
 
 def test_part2():
-    assert str(part2(in_data2)) == part2_ans
+    assert str(part2(in_data2, True)) == part2_ans
         
         
 """.format(
@@ -371,8 +372,16 @@ def solve(
     resp = aoc_session.get(f"https://adventofcode.com/{year}/day/{day}/input")
     data = resp.text
 
-    # import solution
+    log.info("Get stars")
+    stars = 0
+    with requests_cache.disabled():
+        resp = aoc_session.get(f"https://adventofcode.com/{year}/day/{day}")
+        pattern = "Your puzzle answer was <code>"
+        stars = len(re.findall(pattern, resp.text))
+    log.info(f"Got {stars} stars on this day")
 
+    # import solution
+    
     for part in range(1, 3):
         try:
             solve_day = __import__(
@@ -382,9 +391,9 @@ def solve(
             output = vars(solve_day)[f"part{part}"](data)
             click.echo(output)
             send_it = False
-            if autosubmit:
+            if autosubmit and stars<part:
                 send_it = True
-            else:
+            elif stars<part:
                 send_it = click.confirm(
                     f"Send the answer {output} for {year}, day {day}, part {part}?"
                 )

@@ -9,6 +9,7 @@ import math
 
 log = logging.getLogger("aoc_logger")
 
+
 # ternary logic
 class Signal(Enum):
     NONE = 1

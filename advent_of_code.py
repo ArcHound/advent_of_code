@@ -25,7 +25,7 @@ from bs4 import BeautifulSoup
 import aoc
 
 requests_cache.install_cache(
-    cache_name="advent_of_code_requests_cache", backend="sqlite", cache_control=True 
+    cache_name="advent_of_code_requests_cache", backend="sqlite", cache_control=True
 )
 
 load_dotenv()
@@ -381,7 +381,7 @@ def solve(
     log.info(f"Got {stars} stars on this day")
 
     # import solution
-    
+
     for part in range(1, 3):
         try:
             solve_day = __import__(
@@ -391,9 +391,9 @@ def solve(
             output = vars(solve_day)[f"part{part}"](data)
             click.echo(output)
             send_it = False
-            if autosubmit and stars<part:
+            if autosubmit and stars < part:
                 send_it = True
-            elif stars<part:
+            elif stars < part:
                 send_it = click.confirm(
                     f"Send the answer {output} for {year}, day {day}, part {part}?"
                 )

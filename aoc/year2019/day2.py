@@ -3,6 +3,8 @@ import logging
 
 log = logging.getLogger("aoc_logger")
 
+from aoc_lib.intcode2019 import Intcode2019
+
 
 def parse_data(in_data):
     data = list()
@@ -11,38 +13,24 @@ def parse_data(in_data):
     return data
 
 
-def process_program(data_og):
-    ip = 0
-    done = False
-    data = data_og.copy()
-    while not done:
-        code = data[ip]
-        if code == 99:
-            return data[0]
-        elif code == 1:
-            data[data[ip + 3]] = data[data[ip + 1]] + data[data[ip + 2]]
-            ip += 4
-        elif code == 2:
-            data[data[ip + 3]] = data[data[ip + 1]] * data[data[ip + 2]]
-            ip += 4
-        else:
-            return -1  # error
-
-
 def part1(in_data, test=False):
     data = parse_data(in_data)
+    computer = Intcode2019()
     if not test:
         data[1] = 12
         data[2] = 2
-    return process_program(data)
+    computer.process_program(data)
+    return computer.data[0]
 
 
 def part2(in_data, test=False):
     data = parse_data(in_data)
+    computer = Intcode2019()
     for i in range(100):
         for j in range(100):
             data[1] = i
             data[2] = j
-            if process_program(data) == 19690720:
+            computer.process_program(data)
+            if computer.data[0] == 19690720:
                 return i * 100 + j
     return -1

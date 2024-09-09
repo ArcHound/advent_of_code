@@ -405,7 +405,12 @@ def solve(
                 soup = BeautifulSoup(resp.text, "html.parser")
                 click.echo(soup.find("article").find("p").text)
         except ModuleNotFoundError as e:
-            log.critical(f"Solution for {year}, day {day} part {part} not implemented!")
+            if f"No module named 'aoc.year{year}.day{day}'" in str(e):
+                log.critical(
+                    f"Solution for {year}, day {day} part {part} not implemented!"
+                )
+            else:
+                log.critical(str(e))
         except Exception as e:
             log.critical(str(e))
             raise e

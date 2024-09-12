@@ -19,7 +19,7 @@ def part1(in_data, test=False):
     if not test:
         data[1] = 12
         data[2] = 2
-    computer.process_program(data)
+    computer.run_program(data)
     return computer.data[0]
 
 
@@ -30,7 +30,7 @@ def part2(in_data, test=False):
         for j in range(100):
             data[1] = i
             data[2] = j
-            computer.process_program(data)
+            computer.run_program(data)
             if computer.data[0] == 19690720:
                 return i * 100 + j
     return -1

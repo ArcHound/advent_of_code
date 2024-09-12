@@ -118,13 +118,13 @@ def test_process_program():
     for case in cases:
         try:
             computer = Intcode2019()
-            computer.process_program(**case["input"])
+            computer.run_program(**case["input"])
             data = computer.data
             if "data" in case:
                 assert data == case["data"], "case '{}', output: exp {}, got {}".format(
                     case["label"], case["data"], data
                 )
-            stdout = computer.stdout
+            stdout = computer.get_list_output()
             if "stdout" in case:
                 assert (
                     stdout == case["stdout"]

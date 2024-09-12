@@ -7,6 +7,22 @@ def binom(n, k):
     return prod
 
 
+def factorial(n):
+    prod = 1
+    for i in range(n):
+        prod *= i + 1
+    return prod
+
+
+def permutations(elements: list):
+    if len(elements) <= 1:
+        yield elements
+        return
+    for e in elements:
+        for p in permutations([x for x in elements if x != e]):
+            yield [e] + p
+
+
 def buckles(elements, choice_length, comb_index):
     # get i-th combination of selected length from elements
     # everything is zero indexed

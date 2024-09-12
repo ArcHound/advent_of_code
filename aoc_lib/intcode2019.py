@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import logging
 import dataclasses
 from enum import Enum
-from typing import Callable
+from typing import Callable, Iterable
 from collections import deque
+from threading import Thread, Semaphore
 
 log = logging.getLogger("aoc_logger")
 
@@ -25,6 +28,7 @@ class Signal(Enum):
     OK = 0
     ERROR = 1
     HALT = 2
+    INPUT_WAIT = 3
 
 
 @dataclasses.dataclass
@@ -56,13 +60,17 @@ class Intcode2019:
             8: OP_item(code=8, params=3, function=self.op_8),
             99: OP_item(code=99, params=0, function=self.op_99),
         }
-        self.stdout = list()
+        self.stdout = deque()
+        self.stdin = deque()
+        self.stdin_semaphore = Semaphore(value=0)
+        self.send_stdout_to = None
+        self.timeout = 10
 
     def parse_instruction(self, instruction: int):
-        log.debug("--------------------")
-        log.debug(instruction)
+        # log.debug("--------------------")
+        # log.debug(instruction)
         code = instruction % 100
-        log.debug(code)
+        # log.debug(code)
         op = self.op_map.get(code, None)
         if not op:
             raise NotImplementedError(f"Unknown opcode {code}")
@@ -79,36 +87,69 @@ class Intcode2019:
             i += 1
         return params
 
-    def process_program(self, data, stdin=list()):
-        self.ip = 0
-        self.stdin = deque(stdin)
-        self.data = data.copy()
-        done = False
-        while not done:
-            log.debug("---------")
-            log.debug(self.ip)
-            log.debug(self.data)
-            log.debug(self.data[self.ip])
+    def cpu(self, finish_event):
+        while True:
+            # log.debug("---------")
+            # log.debug(self.ip)
+            # log.debug(self.data)
+            # log.debug(self.data[self.ip])
             op, modes = self.parse_instruction(self.data[self.ip])
-            log.debug(op)
-            log.debug(modes)
+            # log.debug(op)
+            # log.debug(modes)
             self.ip += 1
             params = self.prepare_params(modes)
-            log.debug(params)
+            # log.debug(params)
             r = op.function(*params)
-            log.debug(r)
+            # log.debug(r)
             if r.signal == Signal.HALT:
+                if finish_event:
+                    finish_event.set()
                 return 0
             elif r.signal == Signal.ERROR:
                 raise ValueError(f"opcode {op.code} raised error with params {params}")
             elif r.signal == Signal.OK:
-                log.debug("OK")
-                log.debug(r)
+                # log.debug("OK")
+                # log.debug(r)
                 if (r.value is not None) and (r.address is not None):
                     self.data[r.address] = r.value
                 if r.stdout is not None:
-                    self.stdout.append(r.stdout)
-            log.debug("---------")
+                    self.set_output(r.stdout)
+            elif r.signal == Signal.INPUT_WAIT:
+                self.stdin_semaphore.acquire(blocking=True, timeout=self.timeout)
+                val = self.stdin.popleft()
+                addr = r.address
+                self.data[addr] = val
+            # log.debug("---------")
+
+    def run_program(self, data, finish_event=None, stdin=list()):
+        self.ip = 0
+        self.data = data.copy()
+        self.send_list_input(stdin)  # this might be a problem for leftover input
+        cpu_thread = Thread(target=self.cpu, args=(finish_event,))
+        cpu_thread.start()
+
+    def send_single_input(self, a: int):
+        self.stdin.append(a)
+        self.stdin_semaphore.release()
+
+    def send_list_input(self, l: Iterable[int]):
+        for a in l:
+            self.stdin.append(a)
+            self.stdin_semaphore.release()
+
+    def get_single_output(self):
+        return self.stdout.popleft()
+
+    def get_list_output(self):
+        return [self.stdout.popleft() for i in range(len(self.stdout))]
+
+    def set_output(self, val):
+        if self.send_stdout_to:
+            self.send_stdout_to.send_single_input(val)
+        self.stdout.append(val)
+
+    def pipeline(self, source: Intcode2019):
+        self.send_stdout_to = source
 
     # Add
     def op_1(self, a: Parameter, b: Parameter, c: Parameter) -> OP_out:
@@ -133,8 +174,9 @@ class Intcode2019:
     # Read
     def op_3(self, a: Parameter) -> OP_out:
         self.ip += 1
-        val = self.stdin.popleft()
-        return OP_out(signal=Signal.OK, value=val, address=a.value, stdout=None)
+        return OP_out(
+            signal=Signal.INPUT_WAIT, value=None, address=a.value, stdout=None
+        )
 
     # Write
     def op_4(self, a: Parameter) -> OP_out:

@@ -16,12 +16,12 @@ def parse_data(in_data):
 def part1(in_data, test=False):
     data = parse_data(in_data)
     computer = Intcode2019()
-    computer.process_program(data, [1])
+    computer.run_program(data, [1])
     return computer.stdout[-1]
 
 
 def part2(in_data, test=False):
     data = parse_data(in_data)
     computer = Intcode2019()
-    computer.process_program(data, [5])
+    computer.run_program(data, [5])
     return computer.stdout[-1]

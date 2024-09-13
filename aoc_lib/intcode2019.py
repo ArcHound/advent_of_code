@@ -4,8 +4,8 @@ import logging
 import dataclasses
 from enum import Enum
 from typing import Callable, Iterable
-from collections import deque
-from threading import Thread, Semaphore
+from collections import deque, defaultdict
+from threading import Thread, Semaphore, Event
 
 log = logging.getLogger("aoc_logger")
 
@@ -14,12 +14,23 @@ log = logging.getLogger("aoc_logger")
 class Parameter:
     value: int
     mode: int
+    computer: Intcode2019
 
-    def point(self, data):
+    def point_interpreted(self):
         if self.mode == 0:
-            return data[self.value]
+            return self.computer.data[self.value]
         elif self.mode == 1:
             return self.value
+        elif self.mode == 2:
+            return self.computer.data[self.value + self.computer.relative_base]
+        else:
+            raise ValueError(f"Unknown mode {self.mode}")
+
+    def point_literal(self):
+        if self.mode == 0 or self.mode == 1:
+            return self.value
+        elif self.mode == 2:
+            return self.value + self.computer.relative_base
         else:
             raise ValueError(f"Unknown mode {self.mode}")
 
@@ -58,12 +69,14 @@ class Intcode2019:
             6: OP_item(code=6, params=2, function=self.op_6),
             7: OP_item(code=7, params=3, function=self.op_7),
             8: OP_item(code=8, params=3, function=self.op_8),
+            9: OP_item(code=9, params=1, function=self.op_9),
             99: OP_item(code=99, params=0, function=self.op_99),
         }
         self.stdout = deque()
         self.stdin = deque()
         self.stdin_semaphore = Semaphore(value=0)
         self.send_stdout_to = None
+        self.relative_base = 0
         self.timeout = 10
 
     def parse_instruction(self, instruction: int):
@@ -83,7 +96,9 @@ class Intcode2019:
         params = list()
         i = 0
         for m in modes:
-            params.append(Parameter(mode=m, value=self.data[self.ip + i]))
+            params.append(
+                Parameter(mode=m, value=self.data[self.ip + i], computer=self)
+            )
             i += 1
         return params
 
@@ -123,10 +138,17 @@ class Intcode2019:
 
     def run_program(self, data, finish_event=None, stdin=list()):
         self.ip = 0
-        self.data = data.copy()
+        self.data = defaultdict(int)
+        for i in range(len(data)):
+            self.data[i] = data[i]
         self.send_list_input(stdin)  # this might be a problem for leftover input
         cpu_thread = Thread(target=self.cpu, args=(finish_event,))
         cpu_thread.start()
+
+    def run_program_sync(self, data, stdin=list()):
+        finish_event = Event()
+        self.run_program(data, finish_event=finish_event, stdin=stdin)
+        finish_event.wait()
 
     def send_single_input(self, a: int):
         self.stdin.append(a)
@@ -156,8 +178,8 @@ class Intcode2019:
         self.ip += 3
         return OP_out(
             signal=Signal.OK,
-            value=a.point(self.data) + b.point(self.data),
-            address=c.value,
+            value=a.point_interpreted() + b.point_interpreted(),
+            address=c.point_literal(),
             stdout=None,
         )
 
@@ -166,8 +188,8 @@ class Intcode2019:
         self.ip += 3
         return OP_out(
             signal=Signal.OK,
-            value=a.point(self.data) * b.point(self.data),
-            address=c.value,
+            value=a.point_interpreted() * b.point_interpreted(),
+            address=c.point_literal(),
             stdout=None,
         )
 
@@ -175,45 +197,59 @@ class Intcode2019:
     def op_3(self, a: Parameter) -> OP_out:
         self.ip += 1
         return OP_out(
-            signal=Signal.INPUT_WAIT, value=None, address=a.value, stdout=None
+            signal=Signal.INPUT_WAIT, value=None, address=a.point_literal(), stdout=None
         )
 
     # Write
     def op_4(self, a: Parameter) -> OP_out:
         self.ip += 1
         return OP_out(
-            signal=Signal.OK, value=None, address=None, stdout=a.point(self.data)
+            signal=Signal.OK, value=None, address=None, stdout=a.point_interpreted()
         )
 
     # Jump if True
     def op_5(self, a: Parameter, b: Parameter) -> OP_out:
         self.ip += 2
-        if a.point(self.data) != 0:
-            self.ip = b.point(self.data)
+        if a.point_interpreted() != 0:
+            self.ip = b.point_interpreted()
         return OP_out(signal=Signal.OK, value=None, address=None, stdout=None)
 
     # Jump if False
     def op_6(self, a: Parameter, b: Parameter) -> OP_out:
         self.ip += 2
-        if a.point(self.data) == 0:
-            self.ip = b.point(self.data)
+        if a.point_interpreted() == 0:
+            self.ip = b.point_interpreted()
         return OP_out(signal=Signal.OK, value=None, address=None, stdout=None)
 
     # Less than
     def op_7(self, a: Parameter, b: Parameter, c: Parameter) -> OP_out:
         self.ip += 3
-        if a.point(self.data) < b.point(self.data):
-            return OP_out(signal=Signal.OK, value=1, address=c.value, stdout=None)
+        if a.point_interpreted() < b.point_interpreted():
+            return OP_out(
+                signal=Signal.OK, value=1, address=c.point_literal(), stdout=None
+            )
         else:
-            return OP_out(signal=Signal.OK, value=0, address=c.value, stdout=None)
+            return OP_out(
+                signal=Signal.OK, value=0, address=c.point_literal(), stdout=None
+            )
 
     # Equals
     def op_8(self, a: Parameter, b: Parameter, c: Parameter) -> OP_out:
         self.ip += 3
-        if a.point(self.data) == b.point(self.data):
-            return OP_out(signal=Signal.OK, value=1, address=c.value, stdout=None)
+        if a.point_interpreted() == b.point_interpreted():
+            return OP_out(
+                signal=Signal.OK, value=1, address=c.point_literal(), stdout=None
+            )
         else:
-            return OP_out(signal=Signal.OK, value=0, address=c.value, stdout=None)
+            return OP_out(
+                signal=Signal.OK, value=0, address=c.point_literal(), stdout=None
+            )
+
+    # Move Relative Base
+    def op_9(self, a: Parameter) -> OP_out:
+        self.ip += 1
+        self.relative_base += a.point_interpreted()
+        return OP_out(signal=Signal.OK, value=None, address=None, stdout=None)
 
     # Halt
     def op_99(self) -> OP_out:

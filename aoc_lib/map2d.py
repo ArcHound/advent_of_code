@@ -273,13 +273,16 @@ class Map2d:
         i = self.translate_coordinates(point)
         self.obstacle_str = self.obstacle_str[:i] + val + self.obstacle_str[i + 1 :]
 
-    def trace_until_obstacle(self, start, vector):
+    def trace(self, start, vector, until_obstacle=True):
         point = (start[0], start[1])
         line = [point]
         while self.in_bounds((point[0] + vector[0], point[1] + vector[1])):
             point = (point[0] + vector[0], point[1] + vector[1])
             line.append(point)
-            if self.get_obstacle_from_point(point) == Map2d.obstacle_sym:
+            if (
+                until_obstacle
+                and self.get_obstacle_from_point(point) == Map2d.obstacle_sym
+            ):
                 break
         return line
 

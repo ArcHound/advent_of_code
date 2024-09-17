@@ -1,9 +1,7 @@
 # 2019-8
 import logging
 import functools
-from PIL import Image
-import numpy as np
-import matplotlib.pyplot as plt
+from aoc_lib.pixels import default_draw
 
 log = logging.getLogger("aoc_logger")
 width_c = 25
@@ -50,34 +48,20 @@ def part1(in_data, test=False):
 
 def part2(in_data, test=False):
     data = parse_data(in_data)
-    image = list()
+    image = dict()
     for j in range(height_c):
-        row = list()
         for i in range(width_c):
             done = False
             for layer in data:
                 if layer[j][i] == "2":
                     continue
                 else:
-                    row.append(layer[j][i])
+                    image[(i, j)] = int(layer[j][i])
                     done = True
                 if done:
                     break
             if not done:
-                row.append("2")
-        image.append(row)
+                image[(i, j)] = 2
 
-    for row in image:
-        for i in range(len(row)):
-            if row[i] == "0":
-                row[i] = (0, 0, 0)
-            elif row[i] == "1":
-                row[i] = (255, 255, 255)
-            elif row[i] == "2":
-                row[i] = (255, 0, 0)
-    for row in image:
-        log.info(len(row))
-    array = np.array(image, dtype=np.uint8)
-    new_image = Image.fromarray(array)
-    new_image.save("day8_part2.png")
+    default_draw(image)
     return 0

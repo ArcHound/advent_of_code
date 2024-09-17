@@ -75,6 +75,7 @@ class Intcode2019:
         self.stdout = deque()
         self.stdin = deque()
         self.stdin_semaphore = Semaphore(value=0)
+        self.stdout_semaphore = Semaphore(value=0)
         self.send_stdout_to = None
         self.relative_base = 0
         self.timeout = 10
@@ -128,6 +129,7 @@ class Intcode2019:
                 if (r.value is not None) and (r.address is not None):
                     self.data[r.address] = r.value
                 if r.stdout is not None:
+                    self.stdout_semaphore.release()
                     self.set_output(r.stdout)
             elif r.signal == Signal.INPUT_WAIT:
                 self.stdin_semaphore.acquire(blocking=True, timeout=self.timeout)
@@ -160,10 +162,15 @@ class Intcode2019:
             self.stdin_semaphore.release()
 
     def get_single_output(self):
+        self.stdout_semaphore.acquire(blocking=True, timeout=self.timeout)
         return self.stdout.popleft()
 
     def get_list_output(self):
-        return [self.stdout.popleft() for i in range(len(self.stdout))]
+        output = list()
+        for i in range(len(self.stdout)):
+            self.stdout_semaphore.acquire(blocking=True, timeout=self.timeout)
+            output.append(self.stdout.popleft())
+        return output
 
     def set_output(self, val):
         if self.send_stdout_to:

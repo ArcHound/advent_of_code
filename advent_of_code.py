@@ -374,10 +374,12 @@ def solve(
 
     log.info("Get stars")
     stars = 0
-    with requests_cache.disabled():
-        resp = aoc_session.get(f"https://adventofcode.com/{year}/day/{day}")
-        pattern = "Your puzzle answer was <code>"
-        stars = len(re.findall(pattern, resp.text))
+    headers = {"Cache-Control": "no-cache", "Pragma": "no-cache"}
+    resp = aoc_session.get(
+        f"https://adventofcode.com/{year}/day/{day}", headers=headers
+    )
+    pattern = "Your puzzle answer was"
+    stars = len(re.findall(pattern, resp.text))
     log.info(f"Got {stars} stars on this day")
 
     # import solution

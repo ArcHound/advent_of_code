@@ -33,7 +33,7 @@ def v_abs(a):
 
 
 def v_one(a):
-    return (math.copysign(1, a[0]), math.copysign(1, a[1]))
+    return Point3d(math.copysign(1, a.x), math.copysign(1, a.y), math.copysign(1, a.z))
 
 
 def v_cp_sign(vec, sign):

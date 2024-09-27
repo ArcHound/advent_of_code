@@ -109,6 +109,8 @@ class Intcode2019:
             # log.debug(self.ip)
             # log.debug(self.data)
             # log.debug(self.data[self.ip])
+            if finish_event and finish_event.is_set():
+                return 0
             op, modes = self.parse_instruction(self.data[self.ip])
             # log.debug(op)
             # log.debug(modes)
@@ -118,8 +120,8 @@ class Intcode2019:
             r = op.function(*params)
             # log.debug(r)
             if r.signal == Signal.HALT:
-                if finish_event:
-                    finish_event.set()
+                if self.current_process_finish_event:
+                    self.current_process_finish_event.set()
                 return 0
             elif r.signal == Signal.ERROR:
                 raise ValueError(f"opcode {op.code} raised error with params {params}")
@@ -132,7 +134,20 @@ class Intcode2019:
                     self.stdout_semaphore.release()
                     self.set_output(r.stdout)
             elif r.signal == Signal.INPUT_WAIT:
-                self.stdin_semaphore.acquire(blocking=True, timeout=self.timeout)
+                s = self.stdin_semaphore.acquire(blocking=True, timeout=self.timeout)
+                if (
+                    not s
+                    and self.current_process_finish_event
+                    and not self.current_process_finish_event.is_set()
+                ):  # no more stdin, but I need it
+                    self.current_process_finish_event.set()
+                    raise ValueError("STDIN REQUIRED")
+                elif (
+                    self.current_process_finish_event
+                    and not s
+                    and self.current_process_finish_event.is_set()
+                ):
+                    return 0
                 val = self.stdin.popleft()
                 addr = r.address
                 self.data[addr] = val
@@ -141,6 +156,7 @@ class Intcode2019:
     def run_program(self, data, finish_event=None, stdin=list()):
         self.ip = 0
         self.data = defaultdict(int)
+        self.current_process_finish_event = finish_event
         for i in range(len(data)):
             self.data[i] = data[i]
         self.send_list_input(stdin)  # this might be a problem for leftover input
@@ -162,7 +178,20 @@ class Intcode2019:
             self.stdin_semaphore.release()
 
     def get_single_output(self):
-        self.stdout_semaphore.acquire(blocking=True, timeout=self.timeout)
+        s = self.stdout_semaphore.acquire(blocking=True, timeout=self.timeout)
+        if (
+            not s
+            and self.current_process_finish_event
+            and not self.current_process_finish_event.is_set()
+        ):  # no more stdout, but I need it
+            self.current_process_finish_event.set()
+            raise ValueError("NO STDOUT")
+        elif (
+            not s
+            and self.current_process_finish_event
+            and self.current_process_finish_event.is_set()
+        ):
+            return None
         return self.stdout.popleft()
 
     def get_list_output(self):

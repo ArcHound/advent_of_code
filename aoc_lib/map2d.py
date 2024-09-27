@@ -73,6 +73,16 @@ class Map2d:
     obj_sym = "O"
 
     @classmethod
+    def from_point_dict(cls, pointdict: dict[tuple, str], diagonal=False):
+        xs = [k[0] for k in pointdict]
+        ys = [k[1] for k in pointdict]
+        bounds = ((min(xs), min(ys)), (max(xs) + 1, max(ys) + 1))
+        progress = cls.from_obstacle_list([], bounds)
+        for k, i in pointdict.items():
+            progress.set_point(k, i)
+        return progress
+
+    @classmethod
     def from_obstacle_list(cls, obstacles, bounds, diagonal=False):
         obstacle_str = ""
         for j in range(bounds[0][1], bounds[1][1]):

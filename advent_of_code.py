@@ -395,7 +395,7 @@ def solve(
             send_it = False
             if autosubmit and stars < part:
                 send_it = True
-            elif stars < part:
+            elif stars == part - 1:
                 send_it = click.confirm(
                     f"Send the answer {output} for {year}, day {day}, part {part}?"
                 )

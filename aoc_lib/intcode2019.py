@@ -192,7 +192,8 @@ class Intcode2019:
             and self.current_process_finish_event.is_set()
         ):
             return None
-        return self.stdout.popleft()
+        else:
+            return self.stdout.popleft()
 
     def get_list_output(self):
         output = list()

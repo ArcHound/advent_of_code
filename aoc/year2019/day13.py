@@ -6,15 +6,8 @@ from aoc_lib.map2d import Map2d
 log = logging.getLogger("aoc_logger")
 
 
-def parse_data(in_data):
-    data = list()
-    for line in in_data.splitlines():
-        data.append(line)
-    return [int(x) for x in data[0].split(",")]
-
-
 def part1(in_data, test=False):
-    program = parse_data(in_data)
+    program = Intcode2019.parse_int_program(in_data)
     computer = Intcode2019()
     computer.run_program_sync(program)
     output = computer.get_list_output()
@@ -64,7 +57,7 @@ def check_map(program):
 
 
 def part2(in_data, test=False):
-    program = parse_data(in_data)
+    program = Intcode2019.parse_int_program(in_data)
     # hack the memory to make the bar looooong
     for i in range(1324, 1358):
         program[i] = 3

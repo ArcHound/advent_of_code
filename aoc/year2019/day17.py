@@ -7,13 +7,6 @@ from aoc_lib.map2d import Map2d
 log = logging.getLogger("aoc_logger")
 
 
-def parse_data(in_data):
-    data = list()
-    for line in in_data.splitlines():
-        data.append(line)
-    return [int(x) for x in data[0].split(",")]
-
-
 def find_crosses(map2d):
     bounds = (map2d.minimal, map2d.maximal)
     log.info(bounds)
@@ -32,17 +25,12 @@ def find_crosses(map2d):
 
 
 def part1(in_data, test=False):
-    program = parse_data(in_data)
+    program = Intcode2019.parse_int_program(in_data)
     computer = Intcode2019()
     computer.run_program_sync(program)
-    output = computer.get_list_output()
-    log.info(output)
-    map_str = ""
+    map_str = computer.get_ascii_output()
     first = True
     counter = 0
-    map_str = ""
-    for i in output:
-        map_str += chr(i)
     log.info("\n" + map_str)
     map2d = Map2d.from_lines(map_str)
     log.info(map2d.debug_draw())
@@ -111,7 +99,7 @@ def part1(in_data, test=False):
 
 
 def part2(in_data, test=False):
-    program = parse_data(in_data)
+    program = Intcode2019.parse_int_program(in_data)
     program[0] = 2
     computer = Intcode2019()
     code = [
@@ -122,10 +110,7 @@ def part2(in_data, test=False):
         "n",
         "",
     ]
-    log.info("\n".join(code))
-    compiled = [ord(x) for x in "\n".join(code)]
-    log.info(compiled)
-    data = parse_data(in_data)
-    computer.run_program_sync(program, compiled)
+    computer.send_ascii_input("\n".join(code))
+    computer.run_program_sync(program)
     output = computer.get_list_output()
     return output[-1]

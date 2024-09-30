@@ -6,15 +6,8 @@ log = logging.getLogger("aoc_logger")
 from aoc_lib.intcode2019 import Intcode2019
 
 
-def parse_data(in_data):
-    data = list()
-    for line in in_data.splitlines():
-        data += [int(x) for x in line.split(",")]
-    return data
-
-
 def part1(in_data, test=False):
-    data = parse_data(in_data)
+    data = Intcode2019.parse_int_program(in_data)
     computer = Intcode2019()
     if not test:
         data[1] = 12
@@ -24,7 +17,7 @@ def part1(in_data, test=False):
 
 
 def part2(in_data, test=False):
-    data = parse_data(in_data)
+    data = Intcode2019.parse_int_program(in_data)
     computer = Intcode2019()
     for i in range(100):
         for j in range(100):

@@ -6,15 +6,8 @@ from aoc_lib.map2d import Map2d
 log = logging.getLogger("aoc_logger")
 
 
-def parse_data(in_data):
-    data = list()
-    for line in in_data.splitlines():
-        data.append(line)
-    return [int(x) for x in data[0].split(",")]
-
-
 def part1(in_data, test=False):
-    program = parse_data(in_data)
+    program = Intcode2019.parse_int_program(in_data)
     pulled = 0
     obstacle_list = list()
     bounds = ((0, 0), (50, 50))
@@ -32,7 +25,7 @@ def part1(in_data, test=False):
 
 
 def part2(in_data, test=False):
-    program = parse_data(in_data)
+    program = Intcode2019.parse_int_program(in_data)
     pulled = 0
     obstacle_list = list()
     indent = 0

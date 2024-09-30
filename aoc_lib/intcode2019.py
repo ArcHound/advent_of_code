@@ -80,6 +80,10 @@ class Intcode2019:
         self.relative_base = 0
         self.timeout = 10
 
+    @classmethod
+    def parse_int_program(cls, lines):
+        return [int(x) for x in "".join(lines).split(",")]
+
     def parse_instruction(self, instruction: int):
         # log.debug("--------------------")
         # log.debug(instruction)
@@ -177,6 +181,10 @@ class Intcode2019:
             self.stdin.append(a)
             self.stdin_semaphore.release()
 
+    def send_ascii_input(self, s: str):
+        for x in s:
+            self.send_single_input(ord(x))
+
     def get_single_output(self):
         s = self.stdout_semaphore.acquire(blocking=True, timeout=self.timeout)
         if (
@@ -201,6 +209,9 @@ class Intcode2019:
             self.stdout_semaphore.acquire(blocking=True, timeout=self.timeout)
             output.append(self.stdout.popleft())
         return output
+
+    def get_ascii_output(self):
+        return "".join([chr(x) for x in self.get_list_output()])
 
     def set_output(self, val):
         if self.send_stdout_to:

@@ -7,25 +7,17 @@ from threading import Event
 log = logging.getLogger("aoc_logger")
 
 
-def parse_data(in_data):
-    data = list()
-    for line in in_data.splitlines():
-        data.append(line)
-    log.debug(data[0].split(","))
-    return [int(x) for x in data[0].split(",")]
-
-
 def try_sequence(elements, program):
     output = 0
     for i in range(5):
         computer = Intcode2019()
-        computer.run_program(program, stdin=[elements[i], output])
+        computer.run_program_sync(program, stdin=[elements[i], output])
         output = computer.stdout[0]
     return output
 
 
 def part1(in_data, test=False):
-    data = parse_data(in_data)
+    data = Intcode2019.parse_int_program(in_data)
     elements = [0, 1, 2, 3, 4]
     max_output = 0
     for p in permutations(elements):
@@ -51,7 +43,7 @@ def try_sequence_feedback(elements, program):
 
 
 def part2(in_data, test=False):
-    data = parse_data(in_data)
+    data = Intcode2019.parse_int_program(in_data)
     elements = [5, 6, 7, 8, 9]
     max_output = 0
     for p in permutations(elements):

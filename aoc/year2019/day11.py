@@ -50,15 +50,8 @@ class HullPaintingRobot:
         log.debug(f"counter {counter}")
 
 
-def parse_data(in_data):
-    data = list()
-    for line in in_data.splitlines():
-        data.append(line)
-    return [int(x) for x in data[0].split(",")]
-
-
 def part1(in_data, test=False):
-    program = parse_data(in_data)
+    program = Intcode2019.parse_int_program(in_data)
     hpr = HullPaintingRobot(program)
     hpr.gogogo()
     # log.debug(hpr.paint_map)
@@ -66,7 +59,7 @@ def part1(in_data, test=False):
 
 
 def part2(in_data, test=False):
-    program = parse_data(in_data)
+    program = Intcode2019.parse_int_program(in_data)
     hpr = HullPaintingRobot(program)
     hpr.paint_map[(0, 0)] = 1  # start on a white tile
     hpr.gogogo()

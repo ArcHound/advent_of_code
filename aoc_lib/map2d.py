@@ -108,6 +108,7 @@ class Map2d:
     def __init__(self, obstacle_str, bounds=((0, 0), (200, 200)), diagonal=False):
         self.obstacle_str = obstacle_str
         self.diagonal = diagonal
+        self.bounds = bounds
         self.minimal = bounds[0]
         self.maximal = bounds[1]
         self.x_len = self.maximal[0] - self.minimal[0]
@@ -216,6 +217,9 @@ class Map2d:
     def get_flooded_val(self, point):
         return self.flooded[self.translate_coordinates(point)]
 
+    def get_flooded_index(self, index):
+        return self.flooded[index]
+
     def flood(self, starting_point):
         starting_index = self.translate_coordinates(starting_point)
         processing = [starting_index]
@@ -282,6 +286,12 @@ class Map2d:
         new_c = ""
         i = self.translate_coordinates(point)
         self.obstacle_str = self.obstacle_str[:i] + val + self.obstacle_str[i + 1 :]
+
+    def set_index(self, index, val):
+        if 0<=index and index<len(self.obstacle_str):
+            self.obstacle_str = self.obstacle_str[:index] + val + self.obstacle_str[index + 1 :]
+        else:
+            raise ValueError(f"Index {index} out of bounds")
 
     def trace(self, start, vector, until_obstacle=True):
         point = (start[0], start[1])

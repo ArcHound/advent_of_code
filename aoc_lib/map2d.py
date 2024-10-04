@@ -111,6 +111,7 @@ class Map2d:
         self.bounds = bounds
         self.minimal = bounds[0]
         self.maximal = bounds[1]
+        self.portals = list()
         self.x_len = self.maximal[0] - self.minimal[0]
         self.y_len = self.maximal[1] - self.minimal[1]
         if self.x_len * self.y_len != len(obstacle_str):
@@ -161,6 +162,13 @@ class Map2d:
     def in_bounds_index(self, index):
         return index >= 0 and index < len(self.obstacle_str)
 
+    def set_portals_points(self, portals):
+        # ok, this needs explaining
+        # basicaly a digraph in a dict
+        # point to list of points
+        # by default it should return empty list, beware in nearby points
+        self.portals = portals
+
     # can't see points out of bounds
     def nearby_points(self, point):
         if self.diagonal:
@@ -180,7 +188,7 @@ class Map2d:
                     (point[0], point[1] + 1),
                 ]
                 if self.in_bounds(x)
-            ]
+            ] + self.portals.get(point, list())
 
     def nearby_indexes(self, index):
         point = self.translate_index(index)
@@ -288,8 +296,10 @@ class Map2d:
         self.obstacle_str = self.obstacle_str[:i] + val + self.obstacle_str[i + 1 :]
 
     def set_index(self, index, val):
-        if 0<=index and index<len(self.obstacle_str):
-            self.obstacle_str = self.obstacle_str[:index] + val + self.obstacle_str[index + 1 :]
+        if 0 <= index and index < len(self.obstacle_str):
+            self.obstacle_str = (
+                self.obstacle_str[:index] + val + self.obstacle_str[index + 1 :]
+            )
         else:
             raise ValueError(f"Index {index} out of bounds")
 

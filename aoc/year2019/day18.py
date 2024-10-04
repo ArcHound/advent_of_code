@@ -9,6 +9,7 @@ all_doors = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 all_keys = "abcdefghijklmnopqrstuvwxyz"
 player_chr = "@"
 
+
 def special_bfs(map2d, root, key_target, key_dict, door_dict):
     q = deque()
     explored = defaultdict(list)
@@ -20,7 +21,7 @@ def special_bfs(map2d, root, key_target, key_dict, door_dict):
         q = deque(sorted(q, key=lambda x: x[3]))
         # q = deque(sorted(q, key=lambda x: len(x[1])))
         # log.debug(q)
-        v,inv,str_inv,steps = q.popleft()
+        v, inv, str_inv, steps = q.popleft()
         if all([k in inv for k in key_target]):
             return steps
         edges = keyed_flood(map2d, v, inv, key_target, key_dict, door_dict, cache)
@@ -28,7 +29,14 @@ def special_bfs(map2d, root, key_target, key_dict, door_dict):
             buffer = list()
             if k not in explored[inv]:
                 explored[inv].append(k)
-                buffer.append((key_dict[k], frozenset(list(inv)+[k]), str_inv+k, steps+edges[k]))
+                buffer.append(
+                    (
+                        key_dict[k],
+                        frozenset(list(inv) + [k]),
+                        str_inv + k,
+                        steps + edges[k],
+                    )
+                )
                 # buffer.append((key_dict[k], inv+k, steps+edges[k]))
             buffer.sort(key=lambda x: x[3])
             for b in buffer:
@@ -49,7 +57,11 @@ def keyed_flood(map2d, position, keys, key_target, key_dict, door_dict, cache):
             map_copy.set_index(door_dict[d.upper()], Map2d.obstacle_sym)
     map_copy.flood(map_copy.translate_index(position))
     missing_keys = [x for x in key_target if x not in keys]
-    cache[(position, keys)] = {x:map_copy.get_flooded_index(key_dict[x]) for x in missing_keys if map_copy.get_flooded_index(key_dict[x])>0}
+    cache[(position, keys)] = {
+        x: map_copy.get_flooded_index(key_dict[x])
+        for x in missing_keys
+        if map_copy.get_flooded_index(key_dict[x]) > 0
+    }
     # log.debug(map_copy.debug_draw())
     # log.debug('~~~~')
     return cache[(position, keys)]
@@ -71,12 +83,15 @@ def part1(in_data, test=False):
     map2d.set_index(player, Map2d.empty_sym)
     for k in key_dict:
         map2d.set_index(key_dict[k], Map2d.empty_sym)
-    log.debug({x:map2d.translate_index(key_dict[x]) for x in key_dict})
-    log.debug({x:map2d.translate_index(door_dict[x]) for x in door_dict})
+    log.debug({x: map2d.translate_index(key_dict[x]) for x in key_dict})
+    log.debug({x: map2d.translate_index(door_dict[x]) for x in door_dict})
     log.debug(map2d.translate_index(player))
     log.debug(map2d.debug_draw())
-    steps = special_bfs(map2d, player, "".join([x for x in key_dict]), key_dict, door_dict)
-    return steps 
+    steps = special_bfs(
+        map2d, player, "".join([x for x in key_dict]), key_dict, door_dict
+    )
+    return steps
+
 
 def part2(in_data, test=False):
     map2d = Map2d.from_lines(in_data)

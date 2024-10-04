@@ -4,7 +4,7 @@ import pytest
 
 from aoc.year2019.day18 import part1, part2
 
-in_data0 ="""#########
+in_data0 = """#########
 #b.A.@.a#
 #########
 """
@@ -41,13 +41,14 @@ in_data3 = """########################
 
 part3_ans = "81"
 
+
 def test_part1():
     assert str(part1(in_data2, True)) == part2_ans
+
 
 # in_data2 = in_data1
 # part2_ans = "part2 output 2019-18"
 
+
 def test_part2():
     assert str(part2(in_data2, True)) == part2_ans
-        
-        

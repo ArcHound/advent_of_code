@@ -111,7 +111,7 @@ class Map2d:
         self.bounds = bounds
         self.minimal = bounds[0]
         self.maximal = bounds[1]
-        self.portals = list()
+        self.portals = dict()
         self.x_len = self.maximal[0] - self.minimal[0]
         self.y_len = self.maximal[1] - self.minimal[1]
         if self.x_len * self.y_len != len(obstacle_str):

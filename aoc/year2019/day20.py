@@ -2,6 +2,8 @@
 import logging
 from aoc_lib.map2d import Map2d
 from collections import defaultdict
+import networkx as nx
+import matplotlib.pyplot as plt
 
 log = logging.getLogger("aoc_logger")
 
@@ -111,13 +113,8 @@ def parse_data(in_data):
             # log.debug('----')
             # column portals
     log.debug(portals)
-    pure_portals = {
-        portals[x][0]: [portals[x][1]] for x in portals if len(portals[x]) == 2
-    } | {portals[x][1]: [portals[x][0]] for x in portals if len(portals[x]) == 2}
-    log.debug(pure_portals)
     map_lines = "\n".join([x[2:-2] for x in data[2:-2]])
     map2d = Map2d.from_lines(map_lines)
-    map2d.set_portals_points(pure_portals)
     # log.debug(map2d.debug_draw())
     for i in range(len(map2d.obstacle_str)):
         if map2d.obstacle_str[i] not in "#.":
@@ -128,6 +125,11 @@ def parse_data(in_data):
 
 def part1(in_data, test=False):
     map2d, portals = parse_data(in_data)
+    pure_portals = {
+        portals[x][0]: [portals[x][1]] for x in portals if len(portals[x]) == 2
+    } | {portals[x][1]: [portals[x][0]] for x in portals if len(portals[x]) == 2}
+    log.debug(pure_portals)
+    map2d.set_portals_points(pure_portals)
     log.debug(map2d.bounds)
     start_point = portals["AA"][0]
     end_point = portals["ZZ"][0]
@@ -136,5 +138,61 @@ def part1(in_data, test=False):
 
 
 def part2(in_data, test=False):
-    data = parse_data(in_data)
-    return "part2 output 2019-20"
+    map2d, portals = parse_data(in_data)
+    start_point = portals["AA"][0]
+    end_point = portals["ZZ"][0]
+    pure_portals = {
+        portals[x][0]: portals[x][1] for x in portals if len(portals[x]) == 2
+    } | {portals[x][1]: portals[x][0] for x in portals if len(portals[x]) == 2}
+    uniq_portals = [y for x in portals for y in portals[x]]
+    rev_portals = {x: [k for k in portals if x in portals[k]][0] for x in uniq_portals}
+    log.debug(uniq_portals)
+    log.debug(pure_portals)
+    log.debug(portals)
+    max_depth = len(portals) - 1  # this is a wild guess
+    # give me distances between portals - I'll create a graph
+    edges = list()
+    for p in uniq_portals:
+        map2d.flood(p)
+        for q in uniq_portals:
+            q_len = map2d.get_flooded_val(q)
+            if q_len > 0:
+                edges.append((p, q, map2d.get_flooded_val(q)))
+        map2d.clear_flood()
+    log.debug(start_point)
+    log.debug(edges)
+    G = nx.Graph()
+    for i in range(max_depth):
+        for p in uniq_portals:
+            if (p == start_point or p == end_point) and i != 0:
+                continue
+            for q, val in [(q, val) for (x, q, val) in edges if x == p]:
+                G.add_edge((p, i), (q, i), weight=val)
+            if (
+                p in pure_portals
+                and p[0] != 0
+                and p[1] != 0
+                and p[0] != map2d.bounds[1][0] - 1
+                and p[1] != map2d.bounds[1][1] - 1
+            ):  # we want inner portal
+                # log.debug(p)
+                # log.debug(rev_portals[p])
+                # log.debug(pure_portals[p])
+                # log.debug('--------')
+                G.add_edge((p, i), (pure_portals[p], i + 1), weight=1)
+    log.debug(map2d.bounds)
+    # pos = nx.spring_layout(G, seed=42)
+    # nx.draw_networkx_nodes(G, pos, node_size=700)
+    # nx.draw_networkx_edges(G, pos, width=4)
+    # nx.draw_networkx_labels(G, pos)
+    # edge_labels = nx.get_edge_attributes(G, "weight")
+    # nx.draw_networkx_edge_labels(G, pos, edge_labels)
+    # plt.show()
+
+    # p = nx.shortest_path(G, source=(start_point,0), target=(end_point,0), weight="weight")
+    # translated_p = [(rev_portals[a],i) for (a,i) in p]
+    # log.debug(translated_p)
+    p = nx.shortest_path_length(
+        G, source=(start_point, 0), target=(end_point, 0), weight="weight"
+    )
+    return p

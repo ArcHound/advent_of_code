@@ -77,7 +77,7 @@ class Map2d:
         xs = [k[0] for k in pointdict]
         ys = [k[1] for k in pointdict]
         bounds = ((min(xs), min(ys)), (max(xs) + 1, max(ys) + 1))
-        progress = cls.from_obstacle_list([], bounds)
+        progress = cls.from_obstacle_list([], bounds, diagonal)
         for k, i in pointdict.items():
             progress.set_point(k, i)
         return progress
@@ -103,7 +103,7 @@ class Map2d:
                 buf += line.strip()
                 y_len += 1
                 x_len = len(line.strip())
-        return cls(buf, ((0, 0), (x_len, y_len)))
+        return cls(buf, ((0, 0), (x_len, y_len)), diagonal=diagonal)
 
     def __init__(self, obstacle_str, bounds=((0, 0), (200, 200)), diagonal=False):
         self.obstacle_str = obstacle_str
@@ -177,7 +177,7 @@ class Map2d:
                 for i in range(-1, 2)
                 for j in range(-1, 2)
                 if (i != 0 or j != 0) and self.in_bounds((point[0] + i, point[1] + j))
-            ]
+            ] + self.portals.get(point, list())
         else:
             return [
                 x

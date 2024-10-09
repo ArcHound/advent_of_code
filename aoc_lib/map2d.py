@@ -106,7 +106,7 @@ class Map2d:
         return cls(buf, ((0, 0), (x_len, y_len)), diagonal=diagonal)
 
     def __init__(self, obstacle_str, bounds=((0, 0), (200, 200)), diagonal=False):
-        self.obstacle_str = obstacle_str
+        self.obstacle_str = str(obstacle_str)
         self.diagonal = diagonal
         self.bounds = bounds
         self.minimal = bounds[0]

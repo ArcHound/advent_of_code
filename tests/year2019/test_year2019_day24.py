@@ -18,7 +18,7 @@ def test_part1():
 
 
 in_data2 = in_data1
-part2_ans = "part2 output 2019-24"
+part2_ans = "99"
 
 
 def test_part2():

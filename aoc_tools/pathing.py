@@ -30,7 +30,7 @@ def get_module_str(year, day):
     return f"{solution_module}.year{year}.day{day:02}"
 
 
-def solve_part(year, day, part, puzzle_input):
+def get_solution_f(year, day, part):
     try:
         solve_day = __import__(
             get_module_str(year, day),
@@ -39,9 +39,7 @@ def solve_part(year, day, part, puzzle_input):
             [f"part{part}"],
             0,
         )
-        log.info(f"Solving {year}, day {day}, part {part}...")
-        output = vars(solve_day)[f"part{part}"](puzzle_input)
-        return output
+        return vars(solve_day)[f"part{part}"]
     except ModuleNotFoundError as e:
         if f"No module named '{get_module_str(year, day)}'" in str(e):
             raise ModuleNotFoundError(

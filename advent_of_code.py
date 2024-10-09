@@ -16,11 +16,11 @@ from jinja2 import Environment, FileSystemLoader
 import aoc
 from aoc_tools.validators import validate_day, validate_year, validate_day_simple
 from aoc_tools.pathing import (
-    solve_part,
     make_dirs,
     get_solution_path,
     get_test_path,
     get_module_str,
+    get_solution_f,
 )
 from aoc_tools.aoc_service import AOC_Service
 
@@ -310,7 +310,9 @@ def solve(
 
     for part in stars_to_parts[stars]:
         try:
-            output = solve_part(year, day, part, puzzle_input)
+            log.info(f"Solving {year}, day {day}, part {part}...")
+            solution = get_solution_f(year, day, part)
+            output = solution(puzzle_input)
             click.echo(output)
             send_it = False
             if autosubmit and stars < part:

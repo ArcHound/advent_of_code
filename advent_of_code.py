@@ -11,9 +11,17 @@ import pathlib
 
 import click
 from dotenv import load_dotenv
+from jinja2 import Environment, FileSystemLoader
 
 import aoc
-from aoc_tools import toolbox
+from aoc_tools.validators import validate_day, validate_year, validate_day_simple
+from aoc_tools.pathing import (
+    solve_part,
+    make_dirs,
+    get_solution_path,
+    get_test_path,
+    get_module_str,
+)
 from aoc_tools.aoc_service import AOC_Service
 
 load_dotenv()
@@ -97,7 +105,7 @@ def cli():
     type=int,
     show_default=True,
     help="Year of the event",
-    callback=toolbox.validate_year,
+    callback=validate_year,
 )
 @click.option(
     "-d",
@@ -106,7 +114,37 @@ def cli():
     type=int,
     show_default=True,
     help="Day of the event",
-    callback=toolbox.validate_day_simple,
+    callback=validate_day_simple,
+)
+@click.option(
+    "-w",
+    "--workspace",
+    default=pathlib.Path(__file__).resolve().parents[0],
+    type=click.Path(exists=True, dir_okay=True, file_okay=False, readable=True),
+    show_default=True,
+    help="Target dir",
+)
+@click.option(
+    "-t",
+    "--templates",
+    default=pathlib.Path(__file__).resolve().parents[0] / "templates",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False, readable=True),
+    show_default=True,
+    help="Template dir",
+)
+@click.option(
+    "--solution-template",
+    default="solution.py.jinja",
+    type=str,
+    show_default=True,
+    help="Solution template filename",
+)
+@click.option(
+    "--test-template",
+    default="test.py.jinja",
+    type=str,
+    show_default=True,
+    help="Test template filename",
 )
 @click.option(
     "--log-level",
@@ -118,70 +156,30 @@ def cli():
 )
 @log_decorator
 @time_decorator
-def prepare(year, day, log_level):
+def prepare(
+    year, day, workspace, templates, solution_template, test_template, log_level
+):
     """Prepare the template and the test for a given day"""
-    slug = f"{year}-{day}"
-    current_dir = pathlib.Path(__file__).resolve().parents[0]
-    log.info("Creating {}".format(current_dir / "aoc" / f"year{year}" / f"day{day}.py"))
-    pathlib.Path(current_dir / "aoc" / f"year{year}").mkdir(parents=True, exist_ok=True)
-    with open(current_dir / "aoc" / f"year{year}" / f"day{day}.py", "w") as f:
-        f.write(
-            """# {}
-import logging
-
-log = logging.getLogger(\"aoc_logger\")
-
-def parse_data(in_data):
-    data = list()
-    for line in in_data.splitlines():
-        data.append(line)
-    return data
-
-def part1(in_data, test=False):
-    data = parse_data(in_data)
-    return \"part1 output {}\"
-
-def part2(in_data, test=False):
-    data = parse_data(in_data)
-    return \"part2 output {}\"
-""".format(
-                slug, slug, slug
-            )
-        )
-    log.info(
-        "Creating {}".format(current_dir / "tests" / f"year{year}" / f"day{day}.py")
-    )
-    pathlib.Path(current_dir / "tests" / f"year{year}").mkdir(
-        parents=True, exist_ok=True
-    )
-    with open(
-        current_dir / "tests" / f"year{year}" / f"test_year{year}_day{day}.py", "w"
-    ) as f:
-        f.write(
-            """# test {}
-
-import pytest
-
-from aoc.year{}.day{} import part1, part2
-
-in_data1 = \"\"\"
-\"\"\"
-part1_ans = \"part1 output {}\"
-
-def test_part1():
-    assert str(part1(in_data1, True)) == part1_ans
-
-in_data2 = in_data1
-part2_ans = \"part2 output {}\"
-
-def test_part2():
-    assert str(part2(in_data2, True)) == part2_ans
-        
-        
-""".format(
-                slug, year, day, slug, slug
-            )
-        )
+    j_env = Environment(auto_reload=False)
+    j_env.loader = FileSystemLoader(searchpath=templates)
+    make_dirs(workspace, year)
+    solution_path = get_solution_path(workspace, year, day)
+    test_path = get_test_path(workspace, year, day)
+    module = get_module_str(year, day)
+    slug = f"{year}-{day:02}"
+    data = {"slug": slug, "year": year, "day": day, "module": module}
+    log.info("Creating {}".format(solution_path))
+    try:
+        with open(solution_path, "w") as f:
+            f.write(j_env.get_template(solution_template).render(data=data))
+    except OSError as e:
+        log.critical(f"Couldn't write to {solution_path} - check file permissions")
+    log.info("Creating {}".format(test_path))
+    try:
+        with open(test_path, "w") as f:
+            f.write(j_env.get_template(test_template).render(data=data))
+    except OSError as e:
+        log.critical(f"Couldn't write to {test_path} - check file permissions")
     return 0
 
 
@@ -256,7 +254,7 @@ def test_part2():
     type=int,
     show_default=True,
     help="Year of the event",
-    callback=toolbox.validate_year,
+    callback=validate_year,
 )
 @click.option(
     "-d",
@@ -265,7 +263,7 @@ def test_part2():
     type=int,
     show_default=True,
     help="Day of the event",
-    callback=toolbox.validate_day,
+    callback=validate_day,
 )
 @click.option(
     "-s",
@@ -312,7 +310,7 @@ def solve(
 
     for part in stars_to_parts[stars]:
         try:
-            output = toolbox.solve_part(year, day, part, puzzle_input)
+            output = solve_part(year, day, part, puzzle_input)
             click.echo(output)
             send_it = False
             if autosubmit and stars < part:

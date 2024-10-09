@@ -87,10 +87,10 @@ def part1(in_data, test=False):
     log.debug({x: map2d.translate_index(door_dict[x]) for x in door_dict})
     log.debug(map2d.translate_index(player))
     log.debug(map2d.debug_draw())
-    steps = special_bfs(
-        map2d, player, "".join([x for x in key_dict]), key_dict, door_dict
-    )
-    return steps
+    # steps = special_bfs(
+    #     map2d, player, "".join([x for x in key_dict]), key_dict, door_dict
+    # )
+    return 0
 
 
 def part2(in_data, test=False):

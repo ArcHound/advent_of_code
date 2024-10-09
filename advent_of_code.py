@@ -1,32 +1,20 @@
 #!/usr/bin/env python3
 
-import os
-import json
-import csv
 import logging
-import sys
 import time
 import datetime
 import math
 from functools import update_wrapper
 import cProfile
 import pstats
-import importlib
-import pkgutil
 import pathlib
-import re
 
 import click
 from dotenv import load_dotenv
-import requests
-import requests_cache
-from bs4 import BeautifulSoup
 
 import aoc
-
-requests_cache.install_cache(
-    cache_name="advent_of_code_requests_cache", backend="sqlite", cache_control=True
-)
+from aoc_tools import toolbox
+from aoc_tools.aoc_service import AOC_Service
 
 load_dotenv()
 
@@ -96,49 +84,6 @@ def profile_decorator(f):
     return update_wrapper(new_func, f)
 
 
-def validate_day(ctx, param, value):
-    # kinda also validates the year
-    now = datetime.datetime.now()
-    if value < 0:
-        raise click.BadParameter("The day must be a positive integer")
-    if value <= 25 and (ctx.params["year"] < now.year and ctx.params["year"] >= 2015):
-        return value
-    elif ctx.params["year"] == now.year:
-        if value <= now.day and now.month == 12:
-            return value
-        elif now.month < 12:
-            raise click.BadParameter("Chill! AoC didn't start yet.")
-        elif value > now.day:
-            raise click.BadParameter(f"Chill! Day {value} is not ready yet.")
-        else:
-            raise click.BadParameter(
-                f"Don't know what you input as a day, but it's wrong."
-            )
-    elif value > 25:
-        raise click.BadParameter(
-            f"Day must be between 1 and 25, you've entered {value}"
-        )
-    else:
-        raise click.BadParameter("Invalid date of task")
-
-
-def simpler_day(ctx, param, value):
-    if value > 0 and value <= 25:
-        return value
-    else:
-        raise click.BadParameter(
-            f"Day must be between 1 and 25, you've entered {value}"
-        )
-
-
-def validate_year(ctx, param, value):
-    now = datetime.datetime.now()
-    if value <= now.year and value >= 2015:
-        return value
-    else:
-        raise click.BadParameter(f"AoC wasn't happening in year {value}")
-
-
 @click.group()
 def cli():
     pass
@@ -152,7 +97,7 @@ def cli():
     type=int,
     show_default=True,
     help="Year of the event",
-    callback=validate_year,
+    callback=toolbox.validate_year,
 )
 @click.option(
     "-d",
@@ -161,7 +106,7 @@ def cli():
     type=int,
     show_default=True,
     help="Day of the event",
-    callback=simpler_day,
+    callback=toolbox.validate_day_simple,
 )
 @click.option(
     "--log-level",
@@ -311,7 +256,7 @@ def test_part2():
     type=int,
     show_default=True,
     help="Year of the event",
-    callback=validate_year,
+    callback=toolbox.validate_year,
 )
 @click.option(
     "-d",
@@ -320,7 +265,7 @@ def test_part2():
     type=int,
     show_default=True,
     help="Day of the event",
-    callback=validate_day,
+    callback=toolbox.validate_day,
 )
 @click.option(
     "-s",
@@ -360,63 +305,31 @@ def solve(
     # ======================================================================
     proxies = {"http": proxy_address, "https": proxy_address}
 
-    log.info("Init service session...")
-    aoc_session = requests.Session()
-    aoc_session.cookies["session"] = aoc_token
-    if proxy:
-        log.info("Got proxy {} for service {}".format(proxies, "aoc"))
-        aoc_session.proxies.update(proxies)
-        aoc_session.verify = False
+    aoc_svc = AOC_Service(aoc_token, aoc_url, proxy, proxies)
+    puzzle_input = aoc_svc.get_input(year, day)
+    stars = aoc_svc.get_stars(year, day)
+    stars_to_parts = {0: [1], 1: [2], 2: [1, 2]}
 
-    log.info("Get input")
-    resp = aoc_session.get(f"https://adventofcode.com/{year}/day/{day}/input")
-    data = resp.text
-
-    log.info("Get stars")
-    stars = 0
-    headers = {"Cache-Control": "no-cache", "Pragma": "no-cache"}
-    resp = aoc_session.get(
-        f"https://adventofcode.com/{year}/day/{day}", headers=headers
-    )
-    pattern = "Your puzzle answer was"
-    stars = len(re.findall(pattern, resp.text))
-    log.info(f"Got {stars} stars on this day")
-
-    # import solution
-
-    for part in range(1, 3):
+    for part in stars_to_parts[stars]:
         try:
-            solve_day = __import__(
-                f"aoc.year{year}.day{day}", globals(), locals(), [f"part{part}"], 0
-            )
-            log.info(f"Solving {year}, day {day}, part {part}...")
-            output = vars(solve_day)[f"part{part}"](data)
+            output = toolbox.solve_part(year, day, part, puzzle_input)
             click.echo(output)
             send_it = False
             if autosubmit and stars < part:
                 send_it = True
-            elif stars == part - 1:
+            elif stars == part - 1 and not autosubmit:
                 send_it = click.confirm(
                     f"Send the answer {output} for {year}, day {day}, part {part}?"
                 )
             if send_it:
-                resp = aoc_session.post(
-                    f"https://adventofcode.com/{year}/day/{day}/answer",
-                    data={"level": str(part), "answer": str(output)},
-                )
-                soup = BeautifulSoup(resp.text, "html.parser")
-                click.echo(soup.find("article").find("p").text)
-        except ModuleNotFoundError as e:
-            if f"No module named 'aoc.year{year}.day{day}'" in str(e):
-                log.critical(
-                    f"Solution for {year}, day {day} part {part} not implemented!"
-                )
-            else:
-                log.critical(str(e))
+                success, msg = aoc_svc.send_solution(year, day, part, output)
+                if success:
+                    click.secho(msg, fg="green")
+                else:
+                    click.secho(msg, fg="red")
         except Exception as e:
             log.critical(str(e))
             raise e
-
     return 0
 
 

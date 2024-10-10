@@ -12,11 +12,12 @@ log = logging.getLogger("aoc_logger")
 
 
 @dataclasses.dataclass
-class PrivateLeaderboardEntry:
+class LeaderboardEntry:
     name: str
-    stars: int
-    points: int
-    completed: list
+    stars: int = 0
+    points: int = 0
+    completed: list = dataclasses.field(default_factory=lambda: [])
+    badges: list = dataclasses.field(default_factory=lambda: [])
 
 
 class AOC_Service:
@@ -69,7 +70,7 @@ class AOC_Service:
                 (int(x), len(value["completion_day_level"][x]))
                 for x in value["completion_day_level"]
             ]
-            lb_entry = PrivateLeaderboardEntry(
+            lb_entry = LeaderboardEntry(
                 name=value["name"],
                 stars=value["stars"],
                 points=value["local_score"],
@@ -78,8 +79,37 @@ class AOC_Service:
             leaderboard.append(lb_entry)
         return leaderboard
 
+    def parse_global_leaderboard(self, text):
+        soup = BeautifulSoup(text, "html.parser")
+        rows = soup.find_all("div", {"class": "leaderboard-entry"})
+        leaderboard = list()
+        for row in rows:
+            if not row:
+                continue
+            entries = [x for x in row.text.split(" ") if x != ""]
+            entry = None
+            badges = [x for x in entries if x == "(AoC++)" or x == "(Sponsor)"]
+            print(entries)
+            if entries[0].endswith(")"):
+                entry = LeaderboardEntry(
+                    points=int(entries[1]),
+                    name=" ".join(entries[2 : len(entries) - len(badges)]),
+                    badges=badges,
+                )
+            else:
+                entry = LeaderboardEntry(
+                    points=int(entries[0]),
+                    name=" ".join(entries[1 : len(entries) - len(badges)]),
+                    badges=badges,
+                )
+            print(entry)
+            leaderboard.append(entry)
+        return leaderboard
+
     def get_global_leaderboard(self, year):
-        pass
+        resp = self.aoc_session.get(f"{self.aoc_url}/{year}/leaderboard")
+        leaderboard = self.parse_global_leaderboard(resp.text)
+        return leaderboard
 
     def parse_stars(self, text):
         pattern = "Your puzzle answer was"

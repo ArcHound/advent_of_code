@@ -7,6 +7,7 @@ Python3 tool for Advent of Code
  - date sanity checks, defaults to today
  - automatically fetch the input given the AoC year and day (you'd need the token, see [here](https://github.com/wimglenn/advent-of-code-wim/issues/1)).
  - logging and custom lib organization
+ - leaderboard inspection
  - autosubmit found answers
  - built-in profiler
 
@@ -33,6 +34,7 @@ CLI
       --help  Show this message and exit.
     
     Commands:
+      leaderboard  Show leaderboard (global or private (also lists those))
       prepare  Prepare the template and the test for a given day
       solve    Solve for the input of a given day
     
@@ -81,3 +83,22 @@ CLI
                                       Set logging level.  [default: WARNING]
       --help                          Show this message and exit.
     
+
+### Leaderboard command
+
+    Usage: advent_of_code.py leaderboard [OPTIONS]
+    
+      Show leaderboard (global or private (also lists those))
+    
+    Options:
+      -y, --year INTEGER              Year of the event  [default: 2024]
+      -l, --list-leaderboards         List private leaderboards?
+      -i, --leaderboard-id TEXT       Leaderboard id (None for global leaderboard)
+      --aoc-token TEXT                Token for aoc API  [required]
+      --aoc-url TEXT                  Base URL for aoc
+      --proxy                         Whether to use the proxy
+      --proxy-address TEXT            Proxy address
+      --log-level [DEBUG|INFO|WARNING|ERROR|CRITICAL]
+                                      Set logging level.  [default: WARNING]
+      --help                          Show this message and exit.
+

@@ -185,6 +185,123 @@ def prepare(
 
 @cli.command()
 @click.option(
+    "-y",
+    "--year",
+    default=datetime.datetime.now().year,
+    type=int,
+    show_default=True,
+    help="Year of the event",
+    callback=validate_year,
+)
+@click.option(
+    "-l",
+    "--list-leaderboards",
+    default=False,
+    type=bool,
+    is_flag=True,
+    help="List private leaderboards?",
+)
+@click.option(
+    "-i",
+    "--leaderboard-id",
+    default=None,
+    type=str,
+    show_default=True,
+    help="Leaderboard id (None for global leaderboard)",
+)
+@click.option(
+    "--aoc-token",
+    type=str,
+    envvar="AOC_TOKEN",
+    required=True,
+    help="Token for aoc API",
+)
+@click.option(
+    "--aoc-url",
+    type=str,
+    envvar="AOC_URL",
+    default="https://adventofcode.com",
+    help="Base URL for aoc",
+)
+@click.option(
+    "--proxy",
+    is_flag=True,
+    help="Whether to use the proxy",
+    envvar="PROXY",
+)
+@click.option(
+    "--proxy-address",
+    default="http://localhost:8080",
+    help="Proxy address",
+    envvar="PROXY_ADDRESS",
+)
+@click.option(
+    "--log-level",
+    default="WARNING",
+    type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]),
+    show_default=True,
+    help="Set logging level.",
+    envvar="LOG_LEVEL",
+)
+@log_decorator
+@time_decorator
+def leaderboard(
+    year,
+    list_leaderboards,
+    leaderboard_id,
+    aoc_token,
+    aoc_url,
+    proxy,
+    proxy_address,
+    log_level,
+):
+    """Show leaderboard (global or private (also lists those))"""
+    proxies = {"http": proxy_address, "https": proxy_address}
+    aoc_svc = AOC_Service(aoc_token, aoc_url, proxy, proxies)
+    username = aoc_svc.get_user()
+
+    leaderboard_output = ""
+    lids = list()
+    if list_leaderboards:
+        lids = aoc_svc.get_private_leaderboards()
+        if len(lids) > 0:
+            click.echo("Here are your private leaderboard ids:")
+            for lid in lids:
+                click.echo(lid)
+        else:
+            click.echo("You are not a member of any private leaderboard :(")
+        return 0
+    if leaderboard_id:
+        leaderboard = aoc_svc.get_private_leaderboard(year, leaderboard_id)
+        leaderboard.sort(key=lambda x: x.points, reverse=True)
+        star_dict = {
+            0: click.style("*", fg="black"),
+            1: click.style("*", fg="white"),
+            2: click.style("*", fg="yellow"),
+        }
+        for i in range(len(leaderboard)):
+            line = f"{str(i): >3}) "
+            entry = leaderboard[i]
+            line += f"{str(entry.points): >4} "
+            for j in range(25):
+                line += star_dict[entry.completed.get(j+1, 0)]
+            line += " " + str(entry.name)
+            leaderboard_output += line + "\n"
+    else:
+        leaderboard = aoc_svc.get_global_leaderboard(year)
+        leaderboard.sort(key=lambda x: x.points, reverse=True)
+        leaderboard_output = "\n".join(
+            [
+                f"{str(i): >3}) {str(leaderboard[i].points): >4} {leaderboard[i].name}"
+                for i in range(len(leaderboard))
+            ]
+        )
+    click.echo_via_pager(leaderboard_output)
+    return 0
+
+
+@cli.command()
+@click.option(
     "--aoc-token",
     type=str,
     envvar="AOC_TOKEN",

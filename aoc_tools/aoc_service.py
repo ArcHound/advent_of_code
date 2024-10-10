@@ -16,7 +16,7 @@ class LeaderboardEntry:
     name: str
     stars: int = 0
     points: int = 0
-    completed: list = dataclasses.field(default_factory=lambda: [])
+    completed: dict = dataclasses.field(default_factory=lambda: {})
     badges: list = dataclasses.field(default_factory=lambda: [])
 
 
@@ -66,12 +66,17 @@ class AOC_Service:
         ).json()
         leaderboard = list()
         for entry, value in resp.get("members", dict()).items():
-            completions = [
-                (int(x), len(value["completion_day_level"][x]))
+            completions = {
+                int(x): len(value["completion_day_level"][x])
                 for x in value["completion_day_level"]
-            ]
+            }
+            name = None
+            if value["name"]:
+                name = value["name"]
+            else:
+                name = f"(anonymous user #" + str(value["id"]) + ")"
             lb_entry = LeaderboardEntry(
-                name=value["name"],
+                name=name,
                 stars=value["stars"],
                 points=value["local_score"],
                 completed=completions,
@@ -89,7 +94,6 @@ class AOC_Service:
             entries = [x for x in row.text.split(" ") if x != ""]
             entry = None
             badges = [x for x in entries if x == "(AoC++)" or x == "(Sponsor)"]
-            print(entries)
             if entries[0].endswith(")"):
                 entry = LeaderboardEntry(
                     points=int(entries[1]),
@@ -102,7 +106,6 @@ class AOC_Service:
                     name=" ".join(entries[1 : len(entries) - len(badges)]),
                     badges=badges,
                 )
-            print(entry)
             leaderboard.append(entry)
         return leaderboard
 

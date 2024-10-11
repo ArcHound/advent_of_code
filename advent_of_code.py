@@ -8,6 +8,7 @@ from functools import update_wrapper
 import cProfile
 import pstats
 import pathlib
+import webbrowser
 
 import click
 from dotenv import load_dotenv
@@ -95,6 +96,56 @@ def profile_decorator(f):
 @click.group()
 def cli():
     pass
+
+
+@cli.command()
+@click.option(
+    "--aoc-url",
+    type=str,
+    envvar="AOC_URL",
+    default="https://adventofcode.com",
+    help="Base URL for aoc",
+)
+@click.option(
+    "--log-level",
+    default="WARNING",
+    type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]),
+    show_default=True,
+    help="Set logging level.",
+    envvar="LOG_LEVEL",
+)
+@log_decorator
+@time_decorator
+def login(aoc_url, log_level):
+    """*Start here* - Login the tool into the Advent of Code"""
+    click.echo(
+        "Welcome! Let's login into the "
+        + click.style("Advent of Code", fg="bright_yellow", bold=True)
+        + ", shall we."
+    )
+    click.echo(f"We'll open the browser at {aoc_url} so you can login.")
+    click.echo(
+        "Once there, please go to dev tools (F12), network or storage, and grab the session cookie."
+    )
+    click.echo(" ")
+    click.pause()
+    webbrowser.open_new_tab(aoc_url)
+    aoc_token = click.prompt("Please paste the cookie value here")
+    svc = AOC_Service(aoc_token, aoc_url, False, None)
+    user = svc.get_user()
+    click.echo(" ")
+    click.echo(
+        "If your username is "
+        + click.style(user, bold=True, fg="bright_cyan")
+        + ", then you've succesfully logged in."
+    )
+    with open(".env", "w") as f:
+        f.write(f"AOC_TOKEN={aoc_token}\n")
+    click.echo("The token is stored in the .env file, .gitignore should cover you.")
+    click.echo("The expiration time is about 10 years, so don't worry about it.")
+    click.echo(" ")
+    click.secho("Good luck, have fun!", bold=True, fg="bright_yellow")
+    return 0
 
 
 @cli.command()
@@ -252,18 +303,21 @@ def draw_leaderboard(leaderboard, username, private):
     type=str,
     envvar="AOC_URL",
     default="https://adventofcode.com",
+    show_default=True,
     help="Base URL for aoc",
 )
 @click.option(
     "--proxy",
     is_flag=True,
     help="Whether to use the proxy",
+    show_default=True,
     envvar="PROXY",
 )
 @click.option(
     "--proxy-address",
     default="http://localhost:8080",
     help="Proxy address",
+    show_default=True,
     envvar="PROXY_ADDRESS",
 )
 @click.option(
@@ -338,18 +392,21 @@ def leaderboard(
     type=str,
     envvar="AOC_URL",
     default="https://adventofcode.com",
+    show_default=True,
     help="Base URL for aoc",
 )
 @click.option(
     "--proxy",
     is_flag=True,
     help="Whether to use the proxy",
+    show_default=True,
     envvar="PROXY",
 )
 @click.option(
     "--proxy-address",
     default="http://localhost:8080",
     help="Proxy address",
+    show_default=True,
     envvar="PROXY_ADDRESS",
 )
 @click.option(

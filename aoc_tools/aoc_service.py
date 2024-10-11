@@ -52,12 +52,12 @@ class AOC_Service:
 
     def parse_private_leaderboards(self, text):
         soup = BeautifulSoup(text, "html.parser")
-        links = soup.find("article").find("div").find_all("a")
-        return [l["href"].split("/")[-1] for l in links]
+        links = soup.find("article").find_all("div")
+        return {l.find("a")["href"].split("/")[-1]: l.text for l in links}
 
     def get_private_leaderboards(self):
         resp = self.aoc_session.get(f"{self.aoc_url}/leaderboard/private")
-        leaderboards = self.parse_private_leaderboards(resp.text)
+        leaderboards = self.parse_private_leaderboards(resp.content.decode("utf-8"))
         return leaderboards
 
     def get_private_leaderboard(self, year, leaderboard_id):
@@ -111,7 +111,7 @@ class AOC_Service:
 
     def get_global_leaderboard(self, year):
         resp = self.aoc_session.get(f"{self.aoc_url}/{year}/leaderboard")
-        leaderboard = self.parse_global_leaderboard(resp.text)
+        leaderboard = self.parse_global_leaderboard(resp.content.decode("utf-8"))
         return leaderboard
 
     def parse_stars(self, text):
@@ -124,7 +124,7 @@ class AOC_Service:
         stars = 0
         headers = {"Cache-Control": "no-cache", "Pragma": "no-cache"}
         resp = self.aoc_session.get(f"{self.aoc_url}/{year}/day/{day}", headers=headers)
-        stars = self.parse_stars(resp.text)
+        stars = self.parse_stars(resp.content.decode("utf-8"))
         log.info(f"Got {stars} stars on this day")
         return stars
 
@@ -141,5 +141,5 @@ class AOC_Service:
             f"{self.aoc_url}/{year}/day/{day}/answer",
             data={"level": str(part), "answer": str(answer)},
         )
-        success, msg = self.parse_solution_result(resp.text)
+        success, msg = self.parse_solution_result(resp.content.decode("utf-8"))
         return success, msg

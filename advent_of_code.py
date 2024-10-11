@@ -183,6 +183,37 @@ def prepare(
     return 0
 
 
+def draw_leaderboard(leaderboard, username, private):
+    leaderboard.sort(key=lambda x: x.points, reverse=True)
+    star_dict = {
+        0: click.style("*", fg="black"),
+        1: click.style("*", fg="white"),
+        2: click.style("*", fg="bright_yellow"),
+    }
+    position = 1
+    leaderboard_output = ""
+    for i in range(len(leaderboard)):
+        line = ""
+        entry = leaderboard[i]
+        if i > 0 and leaderboard[i].points < leaderboard[i - 1].points:
+            position += 1
+            line += f"{str(position): >3}) "
+        elif i == 0:
+            line += f"{str(position): >3}) "
+        else:
+            line += "     "
+        line += f"{str(entry.points): >4} "
+        if private:
+            for j in range(25):
+                line += star_dict[entry.completed.get(j + 1, 0)]
+        if entry.name == username:
+            line += " " + click.style(str(entry.name), bold=True, fg="bright_cyan")
+        else:
+            line += " " + str(entry.name)
+        leaderboard_output += line + "\n"
+    return leaderboard_output
+
+
 @cli.command()
 @click.option(
     "-y",
@@ -264,38 +295,32 @@ def leaderboard(
     lids = list()
     if list_leaderboards:
         lids = aoc_svc.get_private_leaderboards()
+        lid_dict = {}
         if len(lids) > 0:
             click.echo("Here are your private leaderboard ids:")
-            for lid in lids:
-                click.echo(lid)
+            i = 0
+            for k in lids:
+                click.echo(f"{str(i+1): >3})" + " ".join(lids[k].split(" ")[1:]))
+                lid_dict[i + 1] = k
+                i += 1
+            leaderboard_id = lid_dict.get(
+                click.prompt(
+                    "Select the number of leaderboard to display (or 0 to quit)",
+                    type=int,
+                ),
+                0,
+            )
+            if leaderboard_id == 0:
+                return 0
         else:
             click.echo("You are not a member of any private leaderboard :(")
-        return 0
+            return 0
     if leaderboard_id:
         leaderboard = aoc_svc.get_private_leaderboard(year, leaderboard_id)
-        leaderboard.sort(key=lambda x: x.points, reverse=True)
-        star_dict = {
-            0: click.style("*", fg="black"),
-            1: click.style("*", fg="white"),
-            2: click.style("*", fg="yellow"),
-        }
-        for i in range(len(leaderboard)):
-            line = f"{str(i): >3}) "
-            entry = leaderboard[i]
-            line += f"{str(entry.points): >4} "
-            for j in range(25):
-                line += star_dict[entry.completed.get(j+1, 0)]
-            line += " " + str(entry.name)
-            leaderboard_output += line + "\n"
+        leaderboard_output = draw_leaderboard(leaderboard, username, True)
     else:
         leaderboard = aoc_svc.get_global_leaderboard(year)
-        leaderboard.sort(key=lambda x: x.points, reverse=True)
-        leaderboard_output = "\n".join(
-            [
-                f"{str(i): >3}) {str(leaderboard[i].points): >4} {leaderboard[i].name}"
-                for i in range(len(leaderboard))
-            ]
-        )
+        leaderboard_output = draw_leaderboard(leaderboard, username, False)
     click.echo_via_pager(leaderboard_output)
     return 0
 

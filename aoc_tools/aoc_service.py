@@ -61,8 +61,10 @@ class AOC_Service:
         return leaderboards
 
     def get_private_leaderboard(self, year, leaderboard_id):
+        headers = {"Cache-Control": "no-cache", "Pragma": "no-cache"}
         resp = self.aoc_session.get(
-            f"{self.aoc_url}/{year}/leaderboard/private/view/{leaderboard_id}.json"
+            f"{self.aoc_url}/{year}/leaderboard/private/view/{leaderboard_id}.json",
+            headers=headers,
         ).json()
         leaderboard = list()
         for entry, value in resp.get("members", dict()).items():
@@ -110,7 +112,10 @@ class AOC_Service:
         return leaderboard
 
     def get_global_leaderboard(self, year):
-        resp = self.aoc_session.get(f"{self.aoc_url}/{year}/leaderboard")
+        headers = {"Cache-Control": "no-cache", "Pragma": "no-cache"}
+        resp = self.aoc_session.get(
+            f"{self.aoc_url}/{year}/leaderboard", headers=headers
+        )
         leaderboard = self.parse_global_leaderboard(resp.content.decode("utf-8"))
         return leaderboard
 

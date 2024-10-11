@@ -110,6 +110,7 @@ Finally, you can review the leaderboards using the leaderboard command.
  - or if you know the ID of the leaderboard you can directly provide it using the `-i` option.
 
 Otherwise, it'll show the global leaderboard by default.
+It'll highlight your username as well!
 
     $ ./advent_of_code leaderboard -y2023 -i 9999999
 
@@ -132,4 +133,4 @@ But the point of the advent of code is to code, so in most cases (graph algorith
  - `pixels`: draw image from set of pixels,
  - `intcode2019`: The intcode computer from year 2019 (this was so fun).
 
-An incomplete test suite can be found at `./tests/aoc_lib`
+An incomplete test suite can be found at `./tests/aoc_lib/`. 

@@ -79,7 +79,7 @@ class Intcode2019:
         self.stdout_semaphore = Semaphore(value=0)
         self.send_stdout_to = None
         self.relative_base = 0
-        self.timeout = 0.1
+        self.timeout = 10  # 0.1 for the day 23 networking
         self.default_stdin = default_stdin
         self.idle = 0
 

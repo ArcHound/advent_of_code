@@ -6,6 +6,7 @@ from enum import Enum
 from typing import Callable, Iterable
 from collections import deque, defaultdict
 from threading import Thread, Semaphore, Event
+import time
 
 log = logging.getLogger("aoc_logger")
 
@@ -58,7 +59,7 @@ class OP_item:
 
 
 class Intcode2019:
-    def __init__(self):
+    def __init__(self, default_stdin=False):
         self.ip = 0
         self.op_map = {
             1: OP_item(code=1, params=3, function=self.op_1),
@@ -78,7 +79,9 @@ class Intcode2019:
         self.stdout_semaphore = Semaphore(value=0)
         self.send_stdout_to = None
         self.relative_base = 0
-        self.timeout = 10
+        self.timeout = 0.1
+        self.default_stdin = default_stdin
+        self.idle = 0
 
     @classmethod
     def parse_int_program(cls, lines):
@@ -138,21 +141,7 @@ class Intcode2019:
                     self.stdout_semaphore.release()
                     self.set_output(r.stdout)
             elif r.signal == Signal.INPUT_WAIT:
-                s = self.stdin_semaphore.acquire(blocking=True, timeout=self.timeout)
-                if (
-                    not s
-                    and self.current_process_finish_event
-                    and not self.current_process_finish_event.is_set()
-                ):  # no more stdin, but I need it
-                    self.current_process_finish_event.set()
-                    raise ValueError("STDIN REQUIRED")
-                elif (
-                    self.current_process_finish_event
-                    and not s
-                    and self.current_process_finish_event.is_set()
-                ):
-                    return 0
-                val = self.stdin.popleft()
+                val = self.get_single_input()
                 addr = r.address
                 self.data[addr] = val
             # log.debug("---------")
@@ -175,6 +164,28 @@ class Intcode2019:
     def send_single_input(self, a: int):
         self.stdin.append(a)
         self.stdin_semaphore.release()
+
+    def get_single_input(self):
+        s = self.stdin_semaphore.acquire(blocking=True, timeout=self.timeout)
+        if self.default_stdin and not s:
+            self.idle += 1
+            return -1
+        elif (
+            not s
+            and self.current_process_finish_event
+            and not self.current_process_finish_event.is_set()
+        ):  # no more stdin, but I need it
+            self.current_process_finish_event.set()
+            raise ValueError("STDIN REQUIRED")
+        elif (
+            self.current_process_finish_event
+            and not s
+            and self.current_process_finish_event.is_set()
+        ):
+            return 0
+        else:
+            self.idle = 0
+            return self.stdin.popleft()
 
     def send_list_input(self, l: Iterable[int]):
         for a in l:
@@ -302,3 +313,53 @@ class Intcode2019:
     # Halt
     def op_99(self) -> OP_out:
         return OP_out(signal=Signal.HALT, value=None, address=None, stdout=None)
+
+
+class Router:
+
+    def __init__(self, network):
+        self.addresses = list(network.keys())
+        self.routing_table = {i: network[i] for i in network}
+        self.nat_packet = (-1, -1)
+        self.nat_log = deque()
+
+    def dhcp(self):
+        for i in self.addresses:
+            self.routing_table[i].send_single_input(i)
+
+    def routing(self):
+        holding = {i: deque() for i in self.addresses}
+        counter = 1
+        while True:
+            # if counter % 1000 == 0:
+            #     log.error(counter)
+            # counter += 1
+            idle_counter = 0
+            for i in self.addresses:
+                address = 0
+                x = 0
+                y = 0
+                if len(self.routing_table[i].stdout) >= 3:
+                    address = self.routing_table[i].get_single_output()
+                    x = self.routing_table[i].get_single_output()
+                    y = self.routing_table[i].get_single_output()
+                else:
+                    continue
+                if address == 255:
+                    self.nat_packet = (x, y)
+                    log.error(self.nat_packet)
+                else:
+                    self.routing_table[address].send_single_input(x)
+                    self.routing_table[address].send_single_input(y)
+            if (
+                all([self.routing_table[x].idle >= 10 for x in self.addresses])
+                and sum([len(self.routing_table[x].stdin) for x in self.addresses]) == 0
+            ):
+                log.error("idle!")
+                if self.nat_packet in self.nat_log:
+                    return self.nat_packet
+                self.nat_log.append(self.nat_packet)
+                log.error(self.nat_packet)
+                self.routing_table[0].send_single_input(self.nat_packet[0])
+                self.routing_table[0].send_single_input(self.nat_packet[1])
+                time.sleep(0.2)  # crucial to prevent duplicate idles

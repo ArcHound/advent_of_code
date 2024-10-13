@@ -24,7 +24,7 @@ def ray_traces_from_point(map2d, start):
         seen_vectors.add(norm_vector)
         line = map2d.trace(start, norm_vector)
         # log.debug(line)
-        if map2d.get_obstacle_from_point(line[-1]) == Map2d.obstacle_sym:
+        if map2d.get_point(line[-1]) == Map2d.obstacle_sym:
             obst_list.append(line[-1])
             # log.debug("obstacle")
             seen_obstacles += 1
@@ -125,7 +125,7 @@ def part2(in_data, test=False):
         while not obstacle:
             v = vectors[v_counter]
             for x in vector_map[v]:
-                if map2d.get_obstacle_from_point(x) == Map2d.obstacle_sym:
+                if map2d.get_point(x) == Map2d.obstacle_sym:
                     obstacle = True
                     last_asteroid = x
                     map2d.set_point(x, Map2d.empty_sym)

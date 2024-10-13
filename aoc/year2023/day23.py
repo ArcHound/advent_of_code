@@ -14,11 +14,11 @@ def parse_data(in_data):
     start = None
     end = None
     for x in range(map2d.x_len):
-        if map2d.get_obstacle_from_point((x, 0)) == ".":
+        if map2d.get_point((x, 0)) == ".":
             start = (x, 0)
             break
     for x in range(map2d.x_len):
-        if map2d.get_obstacle_from_point((x, map2d.y_len - 1)) == ".":
+        if map2d.get_point((x, map2d.y_len - 1)) == ".":
             end = (x, map2d.y_len - 1)
             break
     return map2d, start, end
@@ -26,8 +26,8 @@ def parse_data(in_data):
 
 def find_nodes(map2d, starting_point, end_point):
     nodes = [starting_point]
-    start_index = map2d.translate_coordinates(starting_point)
-    end_index = map2d.translate_coordinates(end_point)
+    start_index = map2d.translate_point(starting_point)
+    end_index = map2d.translate_point(end_point)
     # basically, we are searching for tiles that have more than two neighbors, those are our nodes
     for i in range(len(map2d.obstacle_str)):
         if i == start_index or i == end_index or map2d.obstacle_str[i] == "#":
@@ -54,7 +54,7 @@ def flood_edges(map2d, nodes, slippery=True):
     # for each node we travel until we hit another one -> flood
     for node in nodes:
         starting_point = node
-        starting_index = map2d.translate_coordinates(starting_point)
+        starting_index = map2d.translate_point(starting_point)
         processing = [starting_index]
         map2d.clear_flood()
         map2d.flooded[starting_index] = 0

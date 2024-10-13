@@ -85,7 +85,9 @@ def part1(in_data):
     pm = PipeMap2d(pipes, bounds)
     # just flood the pipe, 'water' will run throught the loop
     pm.flood(s)
-    points, val = pm.get_flood_max()  # there's only one max value, get that value
+    points, val = (
+        pm.get_flood_max_indexes()
+    )  # there's only one max value, get that value
     return val
 
 
@@ -99,7 +101,7 @@ def part2(in_data):
     loop_tiles = dict()
     for j in range(0, pm.y_len):
         for i in range(0, pm.x_len):
-            if pm.get_flooded_val((i, j)) != -1:
+            if pm.get_flooded_point((i, j)) != -1:
                 loop_tiles[(i, j)] = pipes[(i, j)]
     # extend the map, so we can flood from all edges
     bounds2 = (
@@ -117,7 +119,7 @@ def part2(in_data):
     for i in range(bounds[0][0], bounds[1][0]):
         for j in range(bounds[0][1], bounds[1][1]):
             # find the dry tiles that are not parts of our loop
-            if (i, j) not in loop_tiles and m.get_flooded_val(
+            if (i, j) not in loop_tiles and m.get_flooded_point(
                 (3 * i + 1, 3 * j + 1)
             ) == -1:
                 count += 1

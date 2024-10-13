@@ -64,16 +64,12 @@ def part2(in_data):
                 log.debug(f"k: {k}")
                 for i in range(0, m.x_len):  # for each vertical point
                     log.debug(f"i: {i}")
-                    if m.get_obstacle_from_point(
-                        (i, j + k - 1)
-                    ) != m.get_obstacle_from_point(
+                    if m.get_point((i, j + k - 1)) != m.get_point(
                         (i, j - k)
                     ):  # check the match
                         log.debug("mistake!")
-                        log.debug(f"{(i,j-k)}: {m.get_obstacle_from_point((i,j-k))}")
-                        log.debug(
-                            f"{(i,j+k-1)}: {m.get_obstacle_from_point((i,j+k-1))}"
-                        )
+                        log.debug(f"{(i,j-k)}: {m.get_point((i,j-k))}")
+                        log.debug(f"{(i,j+k-1)}: {m.get_point((i,j+k-1))}")
                         mistakes += 1
                         if mistakes > total_mistakes:
                             log.debug(
@@ -97,9 +93,7 @@ def part2(in_data):
             match = True
             for k in range(1, min([i, m.x_len - i]) + 1):
                 for j in range(0, m.y_len):
-                    if m.get_obstacle_from_point(
-                        (i + k - 1, j)
-                    ) != m.get_obstacle_from_point((i - k, j)):
+                    if m.get_point((i + k - 1, j)) != m.get_point((i - k, j)):
                         mistakes += 1
                         if mistakes > total_mistakes:
                             match = False

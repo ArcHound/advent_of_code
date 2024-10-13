@@ -2,7 +2,7 @@
 
 import pytest
 
-from aoc.year2019.day25 import part1, part2
+from aoc.year2019.day25 import part1
 
 # in_data1 = """
 # """

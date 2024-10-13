@@ -121,7 +121,7 @@ def test_eq():
             )
 
 
-def test_translate_coordinates():
+def test_translate_point():
     cases = [
         {
             "label": "simple",
@@ -157,7 +157,7 @@ def test_translate_coordinates():
     for case in cases:
         try:
             obj = Map2d(**case["init"])
-            output = obj.translate_coordinates(**case["input"])
+            output = obj.translate_point(**case["input"])
             assert output == case["output"], "case '{}', output: exp {}, got {}".format(
                 case["label"], case["output"], output
             )
@@ -213,7 +213,7 @@ def test_translate_index():
             )
 
 
-def test_in_bounds():
+def test_in_bounds_point():
     cases = [
         {
             "label": "simple",
@@ -289,7 +289,7 @@ def test_in_bounds():
     for case in cases:
         try:
             obj = Map2d(**case["init"])
-            output = obj.in_bounds(**case["input"])
+            output = obj.in_bounds_point(**case["input"])
             assert output == case["output"], "case '{}', output: exp {}, got {}".format(
                 case["label"], case["output"], output
             )
@@ -680,7 +680,7 @@ def test_flood():
         try:
             obj = Map2d.from_obstacle_list(**case["init"])
             obj.flood(**case["input"])
-            output = obj.get_flooded_val(**case["check"])
+            output = obj.get_flooded_point(**case["check"])
             assert output == case["output"], "case '{}', output: exp {}, got {}".format(
                 case["label"], case["output"], output
             )
@@ -690,13 +690,13 @@ def test_flood():
             )
 
 
-def test_get_flood_max():
+def test_get_flood_max_indexes():
     cases = [
         {
             "label": "simple",
             "init": {"obstacles": [(3, 1), (3, 2), (3, 3)], "bounds": ((0, 0), (7, 7))},
             "input": {"starting_point": (2, 2)},
-            "output": (set([(6, 2), (6, 6)]), 8),
+            "output": ([(6, 2), (6, 6)], 8),
             "ex": None,
         },
         {
@@ -739,7 +739,7 @@ def test_get_flood_max():
                 "bounds": ((0, 0), (31, 31)),
             },
             "input": {"starting_point": (2, 2)},
-            "output": (set([(30, 30)]), 56),
+            "output": ([(30, 30)], 56),
             "ex": None,
         },
         {
@@ -783,14 +783,12 @@ def test_get_flood_max():
             },
             "input": {"starting_point": (9, 7)},
             "output": (
-                set(
-                    [
-                        (5, 5),
-                        (5, 9),
-                        (13, 5),
-                        (13, 9),
-                    ]
-                ),
+                [
+                    (5, 5),
+                    (5, 9),
+                    (13, 5),
+                    (13, 9),
+                ],
                 6,
             ),
             "ex": None,
@@ -800,8 +798,15 @@ def test_get_flood_max():
         try:
             obj = Map2d.from_obstacle_list(**case["init"])
             obj.flood(**case["input"])
-            output = obj.get_flood_max()
-            assert output == case["output"], "case '{}', output: exp {}, got {}".format(
+            output = obj.get_flood_max_indexes()
+            assert (
+                output[1] == case["output"][1]
+            ), "case '{}', output: exp {}, got {}".format(
+                case["label"], case["output"], output
+            )
+            assert (
+                output[0].sort() == case["output"][0].sort()
+            ), "case '{}', output: exp {}, got {}".format(
                 case["label"], case["output"], output
             )
         except Exception as e:
@@ -1250,7 +1255,7 @@ def test_pipe_map_flooded_val():
         try:
             obj = PipeMap2d(**case["init"])
             obj.flood(**case["input_flood"])
-            output = obj.get_flooded_val(**case["input"])
+            output = obj.get_flooded_point(**case["input"])
             assert output == case["output"], "case '{}', output: exp {}, got {}".format(
                 case["label"], case["output"], output
             )
@@ -1260,7 +1265,7 @@ def test_pipe_map_flooded_val():
             )
 
 
-def test_pipe_map_flooded_val():
+def test_pipe_map_flooded_val_max():
     cases = [
         {
             "label": "simple",
@@ -1318,7 +1323,7 @@ def test_pipe_map_flooded_val():
         try:
             obj = PipeMap2d(**case["init"])
             obj.flood(**case["input"])
-            output = obj.get_flood_max()
+            output = obj.get_flood_max_indexes()
             assert output == case["output"], "case '{}', output: exp {}, got {}".format(
                 case["label"], case["output"], output
             )

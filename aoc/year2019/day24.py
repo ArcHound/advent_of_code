@@ -112,14 +112,14 @@ def transform2(stack):
                     if layer + s < 0 or layer + s >= len(stack):
                         # raise ValueError("STACK OVERFLOW!!") # shouldn't happen
                         continue
-                    if stack[layer + s].get_obstacle_from_point(p) == "#":
+                    if stack[layer + s].get_point(p) == "#":
                         bug_count += 1
-                if stack[layer].get_obstacle_from_point((i, j)) == ".":
+                if stack[layer].get_point((i, j)) == ".":
                     if bug_count == 1 or bug_count == 2:
                         new_obst_str.append("#")
                     else:
                         new_obst_str.append(".")
-                elif stack[layer].get_obstacle_from_point((i, j)) == "#":
+                elif stack[layer].get_point((i, j)) == "#":
                     if bug_count != 1:
                         new_obst_str.append(".")
                     else:

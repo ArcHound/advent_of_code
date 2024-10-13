@@ -31,8 +31,8 @@ def gravity(map2d, diff=(0, -1)):
             p = map2d.translate_index(i)
             # if we have an empty space in the place we're going to we can go there
             if (
-                map2d.in_bounds(v_add(p, diff))
-                and map2d.get_obstacle_from_point(v_add(p, diff)) == "."
+                map2d.in_bounds_point(v_add(p, diff))
+                and map2d.get_point(v_add(p, diff)) == "."
             ):
                 new_map.set_point(v_add(p, diff), "O")
                 new_map.set_point(p, ".")

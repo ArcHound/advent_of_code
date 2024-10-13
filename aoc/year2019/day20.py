@@ -134,7 +134,7 @@ def part1(in_data, test=False):
     start_point = portals["AA"][0]
     end_point = portals["ZZ"][0]
     map2d.flood(start_point)
-    return map2d.get_flooded_val(end_point)
+    return map2d.get_flooded_point(end_point)
 
 
 def part2(in_data, test=False):
@@ -155,9 +155,9 @@ def part2(in_data, test=False):
     for p in uniq_portals:
         map2d.flood(p)
         for q in uniq_portals:
-            q_len = map2d.get_flooded_val(q)
+            q_len = map2d.get_flooded_point(q)
             if q_len > 0:
-                edges.append((p, q, map2d.get_flooded_val(q)))
+                edges.append((p, q, map2d.get_flooded_point(q)))
         map2d.clear_flood()
     log.debug(start_point)
     log.debug(edges)

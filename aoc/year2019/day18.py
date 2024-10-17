@@ -12,35 +12,40 @@ player_chr = "@"
 
 def special_bfs(map2d, root, key_target, key_dict, door_dict):
     q = deque()
-    explored = defaultdict(list)
-    explored[""] = [root]
-    cache = dict()
-    start = (root, frozenset(), "", 0)
+    map_cache = dict()
+    start = (root, frozenset(), 0)
+    pos_cache = dict()
+    pos_cache[(root, frozenset())] = 0
     q.append(start)
     while len(q) > 0:
-        q = deque(sorted(q, key=lambda x: x[3]))
+        q = deque(sorted(q, key=lambda x: x[2]))
         # q = deque(sorted(q, key=lambda x: len(x[1])))
         # log.debug(q)
-        v, inv, str_inv, steps = q.popleft()
+        v, inv, steps = q.popleft()
         if all([k in inv for k in key_target]):
-            return steps
-        edges = keyed_flood(map2d, v, inv, key_target, key_dict, door_dict, cache)
+            continue
+        edges = keyed_flood(map2d, v, inv, key_target, key_dict, door_dict, map_cache)
         for k in edges:
             buffer = list()
-            if k not in explored[inv]:
-                explored[inv].append(k)
+            new_inv = frozenset(list(inv) + [k])
+            if (key_dict[k], new_inv) not in pos_cache or pos_cache[
+                (key_dict[k], new_inv)
+            ] > steps + edges[k]:
                 buffer.append(
                     (
                         key_dict[k],
-                        frozenset(list(inv) + [k]),
-                        str_inv + k,
+                        new_inv,
                         steps + edges[k],
                     )
                 )
+                pos_cache[(key_dict[k], new_inv)] = steps + edges[k]
                 # buffer.append((key_dict[k], inv+k, steps+edges[k]))
-            buffer.sort(key=lambda x: x[3])
+            buffer.sort(key=lambda x: x[2])
             for b in buffer:
                 q.append(b)
+    return min(
+        [pos_cache[(x, inv)] for x, inv in pos_cache if len(inv) == len(key_dict)]
+    )
 
 
 def keyed_flood(map2d, position, keys, key_target, key_dict, door_dict, cache):
@@ -87,10 +92,10 @@ def part1(in_data, test=False):
     log.debug({x: map2d.translate_index(door_dict[x]) for x in door_dict})
     log.debug(map2d.translate_index(player))
     log.debug(map2d.debug_draw())
-    # steps = special_bfs(
-    #     map2d, player, "".join([x for x in key_dict]), key_dict, door_dict
-    # )
-    return 0
+    steps = special_bfs(
+        map2d, player, "".join([x for x in key_dict]), key_dict, door_dict
+    )
+    return steps
 
 
 def part2(in_data, test=False):

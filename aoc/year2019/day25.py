@@ -106,6 +106,5 @@ def part1(in_data, test=False):
     return "part1 output 2019-25"
 
 
-# def part2(in_data, test=False):
-#     data = parse_data(in_data)
-#     return "part2 output 2019-25"
+def part2(in_data, test=False):
+    return 0

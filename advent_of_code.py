@@ -506,26 +506,40 @@ def solve(
     puzzle_input = aoc_svc.get_input(year, day)
     stars = aoc_svc.get_stars(year, day)
     stars_to_parts = {0: [1], 1: [2], 2: [1, 2]}
+    parts = stars_to_parts[stars]
+    if day == 25:
+        parts = [1, 2]
 
-    for part in stars_to_parts[stars]:
+    for part in parts:
         try:
             log.info(f"Solving {year}, day {day}, part {part}...")
-            solution = get_solution_f(year, day, part)
-            output = solution(puzzle_input)
-            click.echo(output)
-            send_it = False
-            if autosubmit and stars < part:
-                send_it = True
-            elif stars == part - 1 and not autosubmit:
-                send_it = click.confirm(
-                    f"Send the answer {output} for {year}, day {day}, part {part}?"
-                )
-            if send_it:
-                success, msg = aoc_svc.send_solution(year, day, part, output)
-                if success:
-                    click.secho(msg, fg="green")
-                else:
-                    click.secho(msg, fg="red")
+            if part == 2 and day == 25:
+                output = 0
+                send_it = False
+                if autosubmit:
+                    send_it = True
+                elif not autosubmit:
+                    send_it = click.confirm(f"Push the final button?")
+                if send_it:
+                    success, msg = aoc_svc.send_solution(year, day, part, output)
+                    click.echo(msg)
+            else:
+                solution = get_solution_f(year, day, part)
+                output = solution(puzzle_input)
+                click.echo(output)
+                send_it = False
+                if autosubmit and stars < part:
+                    send_it = True
+                elif stars == part - 1 and not autosubmit:
+                    send_it = click.confirm(
+                        f"Send the answer {output} for {year}, day {day}, part {part}?"
+                    )
+                if send_it:
+                    success, msg = aoc_svc.send_solution(year, day, part, output)
+                    if success:
+                        click.secho(msg, fg="green")
+                    else:
+                        click.secho(msg, fg="red")
         except Exception as e:
             log.critical(str(e))
             raise e

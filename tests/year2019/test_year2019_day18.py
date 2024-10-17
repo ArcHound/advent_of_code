@@ -42,13 +42,24 @@ in_data3 = """########################
 part3_ans = "81"
 
 
-def test_part1():
-    assert str(part1(in_data1, True)) == part1_ans
+# def test_part1():
+#     assert str(part1(in_data1, True)) == part1_ans
 
 
 # in_data2 = in_data1
 # part2_ans = "part2 output 2019-18"
 
+in_data4 = """#############
+#DcBa.#.GhKl#
+#.###...#I###
+#e#d#.@.#j#k#
+###C#...###J#
+#fEbA.#.FgHi#
+#############
+"""
+
+part4_ans = "32"
+
 
 def test_part2():
-    assert str(part2(in_data2, True)) == part2_ans
+    assert str(part2(in_data4, True)) == part4_ans

@@ -98,7 +98,89 @@ def part1(in_data, test=False):
     return steps
 
 
+def translate_map(map2d, player):
+    log.debug(map2d.debug_draw())
+    map_copy = Map2d.copy(map2d)
+    indexes = map_copy.nearby_indexes(player, True)
+    indexes.sort()
+    log.debug(indexes)
+    index_map = ["@", "#", "@", "#", "#", "@", "#", "@"]
+    players = list()
+    map_copy.set_index(player, "#")
+    for x in range(8):
+        i = indexes[x]
+        c = index_map[x]
+        if c == "@":
+            players.append(i)
+            map_copy.set_index(i, ".")
+        else:
+            map_copy.set_index(i, "#")
+    return map_copy, tuple(players)
+
+
+def special_bfs_2(map2d, players, key_target, key_dict, door_dict):
+    q = deque()
+    map_cache = dict()
+    start = (players, frozenset(), 0)
+    pos_cache = dict()
+    pos_cache[(players, frozenset())] = 0
+    q.append(start)
+    while len(q) > 0:
+        q = deque(sorted(q, key=lambda x: x[2]))
+        # q = deque(sorted(q, key=lambda x: len(x[1])))
+        # log.debug(q)
+        players, inv, steps = q.popleft()
+        if all([k in inv for k in key_target]):
+            continue
+        for i in range(len(players)):
+            edges = keyed_flood(
+                map2d, players[i], inv, key_target, key_dict, door_dict, map_cache
+            )
+            for k in edges:
+                new_players = list(players)
+                new_players[i] = key_dict[k]
+                new_players = tuple(new_players)
+                buffer = list()
+                new_inv = frozenset(list(inv) + [k])
+                if (new_players, new_inv) not in pos_cache or pos_cache[
+                    (new_players, new_inv)
+                ] > steps + edges[k]:
+                    buffer.append(
+                        (
+                            new_players,
+                            new_inv,
+                            steps + edges[k],
+                        )
+                    )
+                    pos_cache[(new_players, new_inv)] = steps + edges[k]
+                    # buffer.append((key_dict[k], inv+k, steps+edges[k]))
+                buffer.sort(key=lambda x: x[2])
+                for b in buffer:
+                    q.append(b)
+    return min(
+        [pos_cache[(x, inv)] for x, inv in pos_cache if len(inv) == len(key_dict)]
+    )
+
+
 def part2(in_data, test=False):
     map2d = Map2d.from_lines(in_data)
+    player = None
+    key_dict = dict()
+    door_dict = dict()
+    for i in range(len(map2d.obstacle_str)):
+        if map2d.obstacle_str[i] in all_keys:
+            key_dict[map2d.obstacle_str[i]] = i
+        elif map2d.obstacle_str[i] in all_doors:
+            door_dict[map2d.obstacle_str[i]] = i
+        elif map2d.obstacle_str[i] == player_chr:
+            player = i
+    map2d.set_index(player, Map2d.empty_sym)
+    map2d, players = translate_map(map2d, player)
     log.debug(map2d.debug_draw())
-    return "part2 output 2019-18"
+    log.debug([map2d.translate_index(p) for p in players])
+    for k in key_dict:
+        map2d.set_index(key_dict[k], Map2d.empty_sym)
+    steps = special_bfs_2(
+        map2d, players, "".join([x for x in key_dict]), key_dict, door_dict
+    )
+    return steps

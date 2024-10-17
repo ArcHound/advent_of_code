@@ -131,6 +131,10 @@ class Map2d:
                 x_len = len(line.strip())
         return cls(buf, ((0, 0), (x_len, y_len)), diagonal=diagonal)
 
+    @classmethod
+    def copy(cls, other: Map2d) -> Map2d:
+        return Map2d(other.obstacle_str, other.bounds, other.diagonal)
+
     def __init__(
         self,
         obstacle_str: str,
@@ -234,9 +238,9 @@ class Map2d:
         # by default it should return empty list, beware in nearby points
         self.portals = portals
 
-    def nearby_points(self, point: Tuple[int, int]):
+    def nearby_points(self, point: Tuple[int, int], diagonal: bool = None):
         """Nearby points of a given point within the map (accounts for portals)"""
-        if self.diagonal:
+        if (diagonal is None and self.diagonal) or diagonal:
             return [
                 (point[0] + i, point[1] + j)
                 for i in range(-1, 2)
@@ -256,10 +260,10 @@ class Map2d:
                 if self.in_bounds_point(x)
             ] + self.portals.get(point, list())
 
-    def nearby_indexes(self, index: int) -> list[int]:
+    def nearby_indexes(self, index: int, diagonal: bool = None) -> list[int]:
         """Nearby indexes of a given point within the map (accounts for portals)"""
         point = self.translate_index(index)
-        return [self.translate_point(p) for p in self.nearby_points(point)]
+        return [self.translate_point(p) for p in self.nearby_points(point, diagonal)]
 
     ### --------------------------------------------------------------------------
     ###     Flood Methods

@@ -4,16 +4,44 @@ import pytest
 
 from {{ data.module }} import part1, part2
 
-in_data1 = """
-"""
-part1_ans = "part1 output {{ data.slug }}"
-
 def test_part1():
-    assert str(part1(in_data1, True)) == part1_ans
-
-in_data2 = in_data1
-part2_ans = "part2 output {{ data.slug }}"
+    cases = [
+        {
+            "label": "small",
+            "input": {
+                "in_data": """Lines
+"""
+            },
+            "output": "part1 output {{ data.slug }}",
+            "ex": None,
+        },
+    ]
+    for case in cases:
+        try:
+            output = part1(**case["input"])
+            assert output == case["output"], "case '{}', output: exp {}, got {}".format(
+                case["label"], case["output"], output
+            )
+        except Exception as e:
+            assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(case["label"], case["ex"], type(e))
 
 def test_part2():
-    assert str(part2(in_data2, True)) == part2_ans
-
+    cases = [
+        {
+            "label": "small",
+            "input": {
+                "in_data": """Lines
+"""
+            },
+            "output": "part2 output {{ data.slug }}",
+            "ex": None,
+        },
+    ]
+    for case in cases:
+        try:
+            output = part2(**case["input"])
+            assert output == case["output"], "case '{}', output: exp {}, got {}".format(
+                case["label"], case["output"], output
+            )
+        except Exception as e:
+            assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(case["label"], case["ex"], type(e))

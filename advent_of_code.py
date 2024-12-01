@@ -537,7 +537,11 @@ def solve(
                 if send_it:
                     success, msg = aoc_svc.send_solution(year, day, part, output)
                     if success:
-                        click.secho(msg, fg="green")
+                        click.echo(
+                            click.style("*", fg="bright_yellow")
+                            + " "
+                            + click.style(msg, fg="green")
+                        )
                     else:
                         click.secho(msg, fg="red")
         except Exception as e:

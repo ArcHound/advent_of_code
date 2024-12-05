@@ -42,6 +42,7 @@ def part1(in_data, test=False):
 
 
 def toposort(correct_rules):
+    """ This can't run on the input, as there's no total ordering! However, the subsets can be ordered. """
     G = nx.DiGraph()
     for a in correct_rules:
         for b in correct_rules[a]:

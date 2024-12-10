@@ -2,8 +2,46 @@ import datetime
 import json
 from unittest.mock import patch, mock_open
 import pytest
+import math
 
 from aoc_lib.interval import Interval
+
+
+def test_interval_length():
+    cases = [
+        {
+            "label": "normal",
+            "init": {"start": 0, "end": 10},
+            "input": {},
+            "output": 10,
+            "ex": None,
+        },
+        {
+            "label": "one",
+            "init": {"start": 0, "end": 0},
+            "input": {},
+            "output": 0,
+            "ex": None,
+        },
+        {
+            "label": "infinity",
+            "init": {"start": 0, "end": math.inf},
+            "input": {},
+            "output": math.inf,
+            "ex": None,
+        },
+    ]
+    for case in cases:
+        try:
+            obj = Interval(**case["init"])
+            output = obj.length(**case["input"])
+            assert output == case["output"], "case '{}', output: exp {}, got {}".format(
+                case["label"], case["output"], output
+            )
+        except Exception as e:
+            assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
+                case["label"], case["ex"], type(e)
+            )
 
 
 def test_interval_contains():

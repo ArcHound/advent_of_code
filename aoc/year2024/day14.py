@@ -90,6 +90,7 @@ def part2(in_data, test=False):
             to_map.append(position)
         map2d = Map2d.from_obstacle_list(to_map, map_bounds)
         if "##################" in map2d.obstacle_str:
+            log.critical(map2d.debug_draw())
             return i + 1
         data = new_data
     return "Can't find it :("

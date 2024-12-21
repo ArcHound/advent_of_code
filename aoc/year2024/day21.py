@@ -4,9 +4,7 @@ import logging
 from aoc_lib.map2d import Map2d
 from aoc_lib.vector2d import *
 import networkx as nx
-import matplotlib.pyplot as plt
 from functools import cache
-from tqdm import tqdm
 
 log = logging.getLogger("aoc_logger")
 
@@ -158,6 +156,9 @@ def part1(in_data, test=False):
     data = parse_data(in_data)
     total = 0
     for line in data:
+        # translate from numpad
+        first = translate_str(line.strip(), num_paths_sym)
+        # gogogogo
         a = min([find_shortest_input_len(x, 2) for x in first])
         total += int(line.strip()[:-1]) * a
     return total

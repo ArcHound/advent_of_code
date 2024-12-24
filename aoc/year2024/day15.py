@@ -131,8 +131,8 @@ def part2(in_data, test=False):
         # uncomment this to draw the animation
         # copy_map = Map2d(double_map.obstacle_str, double_map.bounds)
         # for o in objects:
-        #     for p in objects[o]:
-        #         copy_map.set_point(p,'O')
+        #     copy_map.set_point(objects[o][0], '[')
+        #     copy_map.set_point(objects[o][1], ']')
         # copy_map.set_point(player[0],i)
         # log.error(copy_map)
     for o in objects:

@@ -24,6 +24,9 @@ class Interval:
             and self.label == other.label
         )
 
+    def length(self) -> int:
+        return self.end - self.start
+
     def contains(self, other: Interval) -> bool:
         return self.start <= other.start and self.end >= other.end
 

@@ -16,6 +16,7 @@ class PipeType(Enum):
     LeftDown = "LeftDown"
     RightDown = "RightDown"
     NoPipe = "NoPipe"
+    Hole = "Hole"
 
 
 class PipeMap2d:
@@ -27,6 +28,7 @@ class PipeMap2d:
         PipeType.LeftDown: ("###", "..#", "#.#"),
         PipeType.RightDown: ("###", "#..", "#.#"),
         PipeType.NoPipe: ("###", "###", "###"),
+        PipeType.Hole: ("...", "...", "..."),
     }
 
     def __init__(self, pipes, bounds=((0, 0), (200, 200))):

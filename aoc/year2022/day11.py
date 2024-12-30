@@ -4,10 +4,6 @@ import logging
 log = logging.getLogger("aoc_logger")
 
 
-def part1(in_data):
-    return "part1 output 2022-11"
-
-
 # in the original run, I didn't bother with a parser
 test_monkeys = [
     {

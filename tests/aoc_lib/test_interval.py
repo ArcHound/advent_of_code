@@ -123,6 +123,64 @@ def test_interval_contains():
             )
 
 
+def test_interval_contains_val():
+    cases = [
+        {
+            "label": "middle",
+            "init": {"start": 0, "end": 10},
+            "input": {"val": 6},
+            "output": True,
+            "ex": None,
+        },
+        {
+            "label": "start edge",
+            "init": {"start": 0, "end": 10},
+            "input": {"val": 0},
+            "output": True,
+            "ex": None,
+        },
+        {
+            "label": "end edge in",
+            "init": {"start": 0, "end": 10},
+            "input": {"val": 9},
+            "output": True,
+            "ex": None,
+        },
+        {
+            "label": "end edge out",
+            "init": {"start": 0, "end": 10},
+            "input": {"val": 10},
+            "output": False,
+            "ex": None,
+        },
+        {
+            "label": "lower out",
+            "init": {"start": 0, "end": 10},
+            "input": {"val": -1},
+            "output": False,
+            "ex": None,
+        },
+        {
+            "label": "higher out",
+            "init": {"start": 0, "end": 10},
+            "input": {"val": 50},
+            "output": False,
+            "ex": None,
+        },
+    ]
+    for case in cases:
+        try:
+            obj = Interval(**case["init"])
+            output = obj.contains_val(**case["input"])
+            assert output == case["output"], "case '{}', output: exp {}, got {}".format(
+                case["label"], case["output"], output
+            )
+        except Exception as e:
+            assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
+                case["label"], case["ex"], type(e)
+            )
+
+
 def test_interval_overlap_other():
     cases = [
         {
@@ -262,6 +320,144 @@ def test_interval_overlap():
     for case in cases:
         try:
             output = Interval.overlap(**case["input"])
+            assert output == case["output"], "case '{}', output: exp {}, got {}".format(
+                case["label"], case["output"], output
+            )
+        except Exception as e:
+            assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
+                case["label"], case["ex"], type(e)
+            )
+
+
+def test_interval_join():
+    cases = [
+        {
+            "label": "middle",
+            "input": {"a": Interval(0, 10), "b": Interval(1, 6)},
+            "output": Interval(0, 10),
+            "ex": None,
+        },
+        {
+            "label": "start edge",
+            "input": {"a": Interval(0, 10), "b": Interval(0, 6)},
+            "output": Interval(0, 10),
+            "ex": None,
+        },
+        {
+            "label": "end edge",
+            "input": {"a": Interval(0, 10), "b": Interval(1, 10)},
+            "output": Interval(0, 10),
+            "ex": None,
+        },
+        {
+            "label": "identity",
+            "input": {"a": Interval(0, 10), "b": Interval(0, 10)},
+            "output": Interval(0, 10),
+            "ex": None,
+        },
+        {
+            "label": "outward contain",
+            "input": {"a": Interval(0, 10), "b": Interval(-1, 12)},
+            "output": Interval(-1, 12),
+            "ex": None,
+        },
+        {
+            "label": "outward contain, same end",
+            "input": {"a": Interval(0, 10), "b": Interval(-1, 10)},
+            "output": Interval(-1, 10),
+            "ex": None,
+        },
+        {
+            "label": "outward contain, same start",
+            "input": {"a": Interval(0, 10), "b": Interval(0, 12)},
+            "output": Interval(0, 12),
+            "ex": None,
+        },
+        {
+            "label": "intersection",
+            "input": {"a": Interval(0, 10), "b": Interval(8, 12)},
+            "output": Interval(0, 12),
+            "ex": None,
+        },
+        {
+            "label": "connect",
+            "input": {"a": Interval(0, 10), "b": Interval(10, 12)},
+            "output": Interval(0, 12),
+            "ex": None,
+        },
+        {
+            "label": "disjoined",
+            "input": {"a": Interval(0, 10), "b": Interval(12, 16)},
+            "output": None,
+            "ex": None,
+        },
+    ]
+    for case in cases:
+        try:
+            output = Interval.join(**case["input"])
+            assert output == case["output"], "case '{}', output: exp {}, got {}".format(
+                case["label"], case["output"], output
+            )
+        except Exception as e:
+            assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
+                case["label"], case["ex"], type(e)
+            )
+
+
+def test_join_list():
+    cases = [
+        {
+            "label": "middle",
+            "input": {
+                "list_a": [
+                    Interval(0, 10),
+                    Interval(0, 0),
+                    Interval(1, 6),
+                    Interval(7, 10),
+                ],
+            },
+            "output": [Interval(0, 10)],
+            "ex": None,
+        },
+        {
+            "label": "connect 3",
+            "input": {
+                "list_a": [Interval(0, 7), Interval(7, 10), Interval(10, 15)],
+            },
+            "output": [Interval(0, 15)],
+            "ex": None,
+        },
+        {
+            "label": "disjoint",
+            "input": {
+                "list_a": [Interval(0, 2), Interval(3, 10)],
+            },
+            "output": [Interval(0, 2), Interval(3, 10)],
+            "ex": None,
+        },
+        {
+            "label": "identity",
+            "input": {"list_a": [Interval(0, 10)]},
+            "output": [Interval(0, 10)],
+            "ex": None,
+        },
+        {
+            "label": "intersection",
+            "input": {
+                "list_a": [
+                    Interval(0, 10),
+                    Interval(11, 16),
+                    Interval(8, 12),
+                    Interval(13, 16),
+                ],
+            },
+            "output": [Interval(0, 16)],
+            "ex": None,
+        },
+    ]
+    for case in cases:
+        try:
+            output = Interval.join_list(**case["input"])
             assert output == case["output"], "case '{}', output: exp {}, got {}".format(
                 case["label"], case["output"], output
             )

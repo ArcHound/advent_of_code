@@ -30,6 +30,9 @@ class Interval:
     def contains(self, other: Interval) -> bool:
         return self.start <= other.start and self.end >= other.end
 
+    def contains_val(self, val: int) -> bool:
+        return self.start <= val and val < self.end
+
     def overlap_other(self, other: Interval) -> bool:
         return (
             self.contains(other)
@@ -46,6 +49,33 @@ class Interval:
             or (a.start > b.start and a.start < b.end)
             or (a.end > b.start and a.end < b.end)
         )
+
+    @classmethod
+    def join(cls, a: Interval, b: Interval) -> Interval:
+        """If intervals overlap or connect ((a,b) and (b,c)) joins them into one interval, else None"""
+        if cls.overlap(a, b) or a.end == b.start or b.end == a.start:
+            return Interval(min((a.start, b.start)), max((a.end, b.end)))
+
+    @classmethod
+    def join_list(cls, list_a: list[Interval]) -> list[Interval]:
+        """Returs a list of intervals with minimal number of intervals after joining them"""
+        joined = list()
+        ordered = sorted(list_a, key=lambda x: x.start)
+        joining = None
+        for interval in ordered:
+            if joining is None:
+                joining = interval
+            elif (
+                cls.overlap(joining, interval)
+                or joining.end == interval.start
+                or joining.start == interval.end
+            ):
+                joining = cls.join(joining, interval)
+            else:
+                joined.append(joining)
+                joining = interval
+        joined.append(joining)
+        return joined
 
     @classmethod
     def least_common_intervals(

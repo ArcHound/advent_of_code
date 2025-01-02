@@ -3,6 +3,7 @@ import logging
 from aoc_lib.vector3d import Point3d, v_add
 from aoc_lib.interval import Interval
 from tqdm import tqdm
+from copy import deepcopy
 
 
 log = logging.getLogger("aoc_logger")
@@ -22,17 +23,17 @@ def parse_data(in_data):
         )
         # probably not required, but I like having the bounds of the objects
         if bounds[0].x >= brick[0].x:
-            bounds[0].x = brick[0].x
+            bounds[0]._replace(x=brick[0].x)
         if bounds[0].y >= brick[0].y:
-            bounds[0].y = brick[0].y
+            bounds[0]._replace(y=brick[0].y)
         if bounds[0].z >= brick[0].z:
-            bounds[0].z = brick[0].z
+            bounds[0]._replace(z=brick[0].z)
         if bounds[1].x < brick[1].x + 1:
-            bounds[1].x = brick[1].x + 1  # half-open intervals
+            bounds[1]._replace(x=brick[1].x + 1)  # half-open intervals
         if bounds[1].y < brick[1].y + 1:
-            bounds[1].y = brick[1].y + 1  # half-open intervals
+            bounds[1]._replace(y=brick[1].y + 1)  # half-open intervals
         if bounds[1].z < brick[1].z + 1:
-            bounds[1].z = brick[1].z + 1  # half-open intervals
+            bounds[1]._replace(z=brick[1].z + 1)  # half-open intervals
         bricks.append(brick)
     return bricks, bounds
 
@@ -84,7 +85,7 @@ def gravity(bricks, bounds, motion_detect_only=False):
     # general idea - evaluate the next step - if it collides with either floor or one of the fixed bricks, it's a collision and we need to move a step back
     for brick in sorted_bricks:
         motion = True
-        moving_brick = (brick[0].copy(), brick[1].copy())
+        moving_brick = (deepcopy(brick[0]), deepcopy(brick[1]))
         moved_that_brick = False
         log.debug(f"Processing {moving_brick}")
         tolerance = 0

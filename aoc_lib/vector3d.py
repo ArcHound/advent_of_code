@@ -1,44 +1,53 @@
 import math
-import dataclasses
+from collections import namedtuple
 
 
-@dataclasses.dataclass
-class Point3d:
-    x: int
-    y: int
-    z: int
-
-    def copy(self):
-        return Point3d(self.x, self.y, self.z)
+Point3d = namedtuple("Point3d", ["x", "y", "z"])
 
 
 def v_add(a, b):
-    return Point3d(a.x + b.x, a.y + b.y, a.z + b.z)
+    return Point3d(a[0] + b[0], a[1] + b[1], a[2] + b[2])
 
 
 def v_diff(a, b):
-    return Point3d(a.x - b.x, a.y - b.y, a.z - b.z)
+    return Point3d(a[0] - b[0], a[1] - b[1], a[2] - b[2])
 
 
 def v_abs_val(a):
-    return abs(a.x) + abs(a.y) + abs(a.z)
+    return abs(a[0]) + abs(a[1]) + abs(a[2])
 
 
 def v_const_mult(a, c):
-    return Point3d(a.x * c, a.y * c, a.z * c)
+    return Point3d(a[0] * c, a[1] * c, a[2] * c)
 
 
 def v_abs(a):
-    return Point3d(abs(a.x), abs(a.y), abs(a.z))
+    return Point3d(abs(a[0]), abs(a[1]), abs(a[2]))
 
 
 def v_one(a):
-    return Point3d(math.copysign(1, a.x), math.copysign(1, a.y), math.copysign(1, a.z))
+    return Point3d(
+        math.copysign(1, a[0]), math.copysign(1, a[1]), math.copysign(1, a[2])
+    )
 
 
 def v_cp_sign(vec, sign):
-    return (math.copysign(vec[0], sign[0]), math.copysign(vec[1], sign[1]))
+    return Point3d(
+        math.copysign(vec[0], sign[0]),
+        math.copysign(vec[1], sign[1]),
+        math.copysign(vec[2], sign[2]),
+    )
 
 
-def v_nearbysquare(a, b):
-    return abs(a[0] - b[0]) <= 1 and abs(a[1] - b[1]) <= 1
+def v_touches_squares(a):
+    return [
+        Point3d(a[0] + 1, a[1], a[2]),
+        Point3d(a[0] - 1, a[1], a[2]),
+        Point3d(a[0], a[1] + 1, a[2]),
+        Point3d(a[0], a[1] - 1, a[2]),
+        Point3d(a[0], a[1], a[2] + 1),
+        Point3d(a[0], a[1], a[2] - 1),
+    ]
+
+
+# def v_nearbycube(a,b):

@@ -240,7 +240,7 @@ def part1(in_data, test=False):
     for inp in input_list:
         pos, p_dir = process_input(inp, pos, p_dir)
         point = map2d.translate_index([x for x in nodes if nodes[x] == pos][0])
-        log_debug_position(map2d, point)
+        # log_debug_position(map2d, point)
     end = map2d.translate_index([x for x in nodes if nodes[x] == pos][0])
     return 1000 * (end[1] + 1) + 4 * (end[0] + 1) + p_dir
 

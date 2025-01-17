@@ -7,8 +7,8 @@ import math
 
 @dataclasses.dataclass
 class Moon:
-    position: Point3d
-    velocity: Point3d
+    position: tuple
+    velocity: tuple
 
 
 log = logging.getLogger("aoc_logger")
@@ -21,25 +21,73 @@ def gravity(moons):
                 continue
             if moons[i].position.x != moons[j].position.x:
                 if moons[i].position.x > moons[j].position.x:
-                    moons[i].velocity.x -= 1
-                    moons[j].velocity.x += 1
+                    moons[i].velocity = Point3d(
+                        moons[i].velocity.x - 1,
+                        moons[i].velocity.y,
+                        moons[i].velocity.z,
+                    )
+                    moons[j].velocity = Point3d(
+                        moons[j].velocity.x + 1,
+                        moons[j].velocity.y,
+                        moons[j].velocity.z,
+                    )
                 else:
-                    moons[i].velocity.x += 1
-                    moons[j].velocity.x -= 1
+                    moons[i].velocity = Point3d(
+                        moons[i].velocity.x + 1,
+                        moons[i].velocity.y,
+                        moons[i].velocity.z,
+                    )
+                    moons[j].velocity = Point3d(
+                        moons[j].velocity.x - 1,
+                        moons[j].velocity.y,
+                        moons[j].velocity.z,
+                    )
             if moons[i].position.y != moons[j].position.y:
                 if moons[i].position.y > moons[j].position.y:
-                    moons[i].velocity.y -= 1
-                    moons[j].velocity.y += 1
+                    moons[i].velocity = Point3d(
+                        moons[i].velocity.x,
+                        moons[i].velocity.y - 1,
+                        moons[i].velocity.z,
+                    )
+                    moons[j].velocity = Point3d(
+                        moons[j].velocity.x,
+                        moons[j].velocity.y + 1,
+                        moons[j].velocity.z,
+                    )
                 else:
-                    moons[i].velocity.y += 1
-                    moons[j].velocity.y -= 1
+                    moons[i].velocity = Point3d(
+                        moons[i].velocity.x,
+                        moons[i].velocity.y + 1,
+                        moons[i].velocity.z,
+                    )
+                    moons[j].velocity = Point3d(
+                        moons[j].velocity.x,
+                        moons[j].velocity.y - 1,
+                        moons[j].velocity.z,
+                    )
             if moons[i].position.z != moons[j].position.z:
                 if moons[i].position.z > moons[j].position.z:
-                    moons[i].velocity.z -= 1
-                    moons[j].velocity.z += 1
+                    moons[i].velocity = Point3d(
+                        moons[i].velocity.x,
+                        moons[i].velocity.y,
+                        moons[i].velocity.z - 1,
+                    )
+                    moons[j].velocity = Point3d(
+                        moons[j].velocity.x,
+                        moons[j].velocity.y,
+                        moons[j].velocity.z + 1,
+                    )
                 else:
-                    moons[i].velocity.z += 1
-                    moons[j].velocity.z -= 1
+                    moons[i].velocity = Point3d(
+                        moons[i].velocity.x,
+                        moons[i].velocity.y,
+                        moons[i].velocity.z + 1,
+                    )
+                    moons[j].velocity = Point3d(
+                        moons[j].velocity.x,
+                        moons[j].velocity.y,
+                        moons[j].velocity.z - 1,
+                    )
 
 
 def velocity(moons):
@@ -76,6 +124,7 @@ def part1(in_data, test=False):
     for i in range(steps):
         gravity(moons)
         velocity(moons)
+        log.debug(moons)
     return sum([v_abs_val(moon.position) * v_abs_val(moon.velocity) for moon in moons])
 
 
@@ -95,12 +144,12 @@ def part2(in_data, test=False):
         ys = [moon.position.y for moon in moons]
         zs = [moon.position.z for moon in moons]
         if xs == first_xs and not stop[0]:
-            cycle.x = counter
+            cycle = Point3d(counter, cycle.y, cycle.z)
             stop[0] = True
         if ys == first_ys and not stop[1]:
-            cycle.y = counter
+            cycle = Point3d(cycle.x, counter, cycle.z)
             stop[1] = True
         if zs == first_zs and not stop[2]:
-            cycle.z = counter
+            cycle = Point3d(cycle.x, cycle.y, counter)
             stop[2] = True
     return math.lcm(cycle.x, cycle.y, cycle.z)

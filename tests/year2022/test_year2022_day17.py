@@ -16,7 +16,7 @@ def test_part1():
                 "in_data": simple_test,
                 "test": True,
             },
-            "output": "3171",
+            "output": "3068",
             "ex": None,
         },
     ]
@@ -42,7 +42,7 @@ def test_part2():
                 "in_data": simple_test,
                 "test": True,
             },
-            "output": "part2 output 2022-17",
+            "output": "1514285714288",
             "ex": None,
         },
     ]

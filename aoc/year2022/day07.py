@@ -80,7 +80,7 @@ def count_sizes(dirstruct, dircounts, path):
             in_dir_size = count_sizes(dirstruct, dircounts, path + [k])
             dircounts.append((in_dir_size, path + [k]))
             size += in_dir_size
-            log.debug(f"Append {in_dir_size}, {path+[k]}")
+            log.debug(f"Append {in_dir_size}, {path + [k]}")
     log.debug(size)
     return size
 

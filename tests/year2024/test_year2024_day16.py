@@ -63,10 +63,10 @@ def test_part1():
     for case in cases:
         try:
             output = part1(**case["input"])
-            assert str(output) == str(
-                case["output"]
-            ), "case '{}', output: exp {}, got {}".format(
-                case["label"], case["output"], output
+            assert str(output) == str(case["output"]), (
+                "case '{}', output: exp {}, got {}".format(
+                    case["label"], case["output"], output
+                )
             )
         except Exception as e:
             assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
@@ -115,10 +115,10 @@ def test_part2():
     for case in cases:
         try:
             output = part2(**case["input"])
-            assert str(output) == str(
-                case["output"]
-            ), "case '{}', output: exp {}, got {}".format(
-                case["label"], case["output"], output
+            assert str(output) == str(case["output"]), (
+                "case '{}', output: exp {}, got {}".format(
+                    case["label"], case["output"], output
+                )
             )
         except Exception as e:
             assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(

@@ -354,7 +354,7 @@ def leaderboard(
             click.echo("Here are your private leaderboard ids:")
             i = 0
             for k in lids:
-                click.echo(f"{str(i+1): >3})" + " ".join(lids[k].split(" ")[1:]))
+                click.echo(f"{str(i + 1): >3})" + " ".join(lids[k].split(" ")[1:]))
                 lid_dict[i + 1] = k
                 i += 1
             leaderboard_id = lid_dict.get(

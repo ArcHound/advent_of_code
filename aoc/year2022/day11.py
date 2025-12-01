@@ -321,7 +321,7 @@ def monkey_business(rounds, monkeys, reduce_worry=False):
         # debug and tracking purposes only, can be omitted
         if (i + 1) % 1000 == 0:
             # log.info(f"After round {i}, the monkeys are holding items with these worry levels:")
-            log.info(f"== After round {i+1} ==")
+            log.info(f"== After round {i + 1} ==")
             for m in jungle.monkeys:
                 log.info(
                     f"Monkey {m} inspected items {jungle.get_monkey(m).get_count()} times."

@@ -140,11 +140,7 @@ def process_interval_obj(interval_obj, rules_map):
                 p = p_int[key]
                 log.debug(p)
                 log.debug("HELP1")
-                for (
-                    single_interval
-                ) in (
-                    p
-                ):  # take a look at the key and return all possible intervals for futher processing
+                for single_interval in p:  # take a look at the key and return all possible intervals for futher processing
                     log.debug("HELP2")
                     log.debug(single_interval)
                     ints = interval_rule(single_interval, **rule)

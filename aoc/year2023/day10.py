@@ -109,9 +109,7 @@ def part2(in_data):
         (bounds[1][0] + 1, bounds[1][1] + 1),
     )
     pm2 = PipeMap2d(loop_tiles, bounds2)
-    m = (
-        pm2.inner_map
-    )  # the pipe tile is represented as a 3x3 tile where walls are tiles -> easier to work with
+    m = pm2.inner_map  # the pipe tile is represented as a 3x3 tile where walls are tiles -> easier to work with
     m.invert_obstacles()  # however, flooded tiles are our obstacles now, everything else can be passed through
     m.flood((0, 0))  # flood again, this time the dry tiles are the inner tiles
     log.debug(m.debug_draw())

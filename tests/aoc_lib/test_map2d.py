@@ -376,10 +376,10 @@ def test_nearby_points():
         try:
             obj = Map2d(**case["init"])
             output = obj.nearby_points(**case["input"])
-            assert set(output) == set(
-                case["output"]
-            ), "case '{}', output: exp {}, got {}".format(
-                case["label"], case["output"], output
+            assert set(output) == set(case["output"]), (
+                "case '{}', output: exp {}, got {}".format(
+                    case["label"], case["output"], output
+                )
             )
         except Exception as e:
             assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
@@ -799,15 +799,15 @@ def test_get_flood_max_indexes():
             obj = Map2d.from_obstacle_list(**case["init"])
             obj.flood(**case["input"])
             output = obj.get_flood_max_indexes()
-            assert (
-                output[1] == case["output"][1]
-            ), "case '{}', output: exp {}, got {}".format(
-                case["label"], case["output"], output
+            assert output[1] == case["output"][1], (
+                "case '{}', output: exp {}, got {}".format(
+                    case["label"], case["output"], output
+                )
             )
-            assert (
-                output[0].sort() == case["output"][0].sort()
-            ), "case '{}', output: exp {}, got {}".format(
-                case["label"], case["output"], output
+            assert output[0].sort() == case["output"][0].sort(), (
+                "case '{}', output: exp {}, got {}".format(
+                    case["label"], case["output"], output
+                )
             )
         except Exception as e:
             assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(

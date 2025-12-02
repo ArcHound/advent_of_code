@@ -1,4 +1,5 @@
 import pytest
+# vim: nomodeline
 
 from aoc_lib.intcode2019 import *
 

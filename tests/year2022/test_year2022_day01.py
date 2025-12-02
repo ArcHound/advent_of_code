@@ -1,4 +1,5 @@
 import pytest
+# vim: nomodeline
 
 from aoc.year2022.day01 import part1, part2
 

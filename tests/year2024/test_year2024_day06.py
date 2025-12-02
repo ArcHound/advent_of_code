@@ -1,4 +1,5 @@
 # test 2024-06
+# vim: nomodeline
 
 import pytest
 

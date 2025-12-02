@@ -1,4 +1,5 @@
 import datetime
+# vim: nomodeline
 import json
 from unittest.mock import patch, mock_open
 import pytest

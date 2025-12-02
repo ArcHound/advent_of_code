@@ -1,24 +1,19 @@
-# test 2022-21
+# test 2025-01
 
 import pytest
 
-from aoc.year2022.day21 import part1, part2
+from aoc.year2025.day01 import part1, part2
 
-simple_test = """root: pppw + sjmn
-dbpl: 5
-cczh: sllz + lgvd
-zczc: 2
-ptdq: humn - dvpt
-dvpt: 3
-lfqf: 4
-humn: 5
-ljgn: 2
-sjmn: drzm * dbpl
-sllz: 4
-pppw: cczh / lfqf
-lgvd: ljgn * ptdq
-drzm: hmdt - zczc
-hmdt: 32
+simple_test = """L68
+L30
+R48
+L5
+R60
+L55
+L1
+L99
+R14
+L82
 """
 
 
@@ -30,7 +25,7 @@ def test_part1():
                 "in_data": simple_test,
                 "test": True,
             },
-            "output": "152",
+            "output": "3",
             "ex": None,
         },
     ]
@@ -56,7 +51,43 @@ def test_part2():
                 "in_data": simple_test,
                 "test": True,
             },
-            "output": "301",
+            "output": "6",
+            "ex": None,
+        },
+        {
+            "label": "2L",
+            "input": {
+                "in_data": "L150",
+                "test": True,
+            },
+            "output": "2",
+            "ex": None,
+        },
+        {
+            "label": "2R",
+            "input": {
+                "in_data": "R150",
+                "test": True,
+            },
+            "output": "2",
+            "ex": None,
+        },
+        {
+            "label": "2R2L",
+            "input": {
+                "in_data": "R150\nL201",
+                "test": True,
+            },
+            "output": "4",
+            "ex": None,
+        },
+        {
+            "label": "2L2R",
+            "input": {
+                "in_data": "L150\nR201",
+                "test": True,
+            },
+            "output": "4",
             "ex": None,
         },
     ]

@@ -316,7 +316,6 @@ class Intcode2019:
 
 
 class Router:
-
     def __init__(self, network):
         self.addresses = list(network.keys())
         self.routing_table = {i: network[i] for i in network}

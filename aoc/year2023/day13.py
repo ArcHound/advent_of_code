@@ -31,9 +31,7 @@ def part1(in_data):
         (
             h_axis,
             v_axis,
-        ) = (
-            m.find_reflection_axes()
-        )  # this method is pretty general, into the lib it goes
+        ) = m.find_reflection_axes()  # this method is pretty general, into the lib it goes
         if not h_axis:
             h_axis = 0
         if not v_axis:
@@ -68,8 +66,8 @@ def part2(in_data):
                         (i, j - k)
                     ):  # check the match
                         log.debug("mistake!")
-                        log.debug(f"{(i,j-k)}: {m.get_point((i,j-k))}")
-                        log.debug(f"{(i,j+k-1)}: {m.get_point((i,j+k-1))}")
+                        log.debug(f"{(i, j - k)}: {m.get_point((i, j - k))}")
+                        log.debug(f"{(i, j + k - 1)}: {m.get_point((i, j + k - 1))}")
                         mistakes += 1
                         if mistakes > total_mistakes:
                             log.debug(

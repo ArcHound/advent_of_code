@@ -9,5 +9,5 @@ matplotlib
 pytest
 coverage
 tqdm
-jinja
+Jinja2
 sympy

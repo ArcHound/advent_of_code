@@ -584,10 +584,10 @@ def test_label_mask():
     for case in cases:
         try:
             output = Interval.label_mask(**case["input"])
-            assert (
-                case["input"]["list_a"] == case["output"]
-            ), "case '{}', output: exp {}, got {}".format(
-                case["label"], case["output"], output
+            assert case["input"]["list_a"] == case["output"], (
+                "case '{}', output: exp {}, got {}".format(
+                    case["label"], case["output"], output
+                )
             )
         except Exception as e:
             assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(

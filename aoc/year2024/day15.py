@@ -129,12 +129,12 @@ def part2(in_data, test=False):
                 else:
                     objects[j] = next_positions[j]
         # uncomment this to draw the animation
-        # copy_map = Map2d(double_map.obstacle_str, double_map.bounds)
-        # for o in objects:
-        #     copy_map.set_point(objects[o][0], '[')
-        #     copy_map.set_point(objects[o][1], ']')
-        # copy_map.set_point(player[0],i)
-        # log.error(copy_map)
+        copy_map = Map2d(double_map.obstacle_str, double_map.bounds)
+        for o in objects:
+            copy_map.set_point(objects[o][0], "[")
+            copy_map.set_point(objects[o][1], "]")
+        copy_map.set_point(player[0], i)
+        log.error(copy_map)
     for o in objects:
         for p in objects[o]:
             double_map.set_point(p, "O")

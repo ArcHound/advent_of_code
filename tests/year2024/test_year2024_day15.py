@@ -32,10 +32,10 @@ def test_part1():
     for case in cases:
         try:
             output = part1(**case["input"])
-            assert str(output) == str(
-                case["output"]
-            ), "case '{}', output: exp {}, got {}".format(
-                case["label"], case["output"], output
+            assert str(output) == str(case["output"]), (
+                "case '{}', output: exp {}, got {}".format(
+                    case["label"], case["output"], output
+                )
             )
         except Exception as e:
             assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
@@ -114,10 +114,10 @@ v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
     for case in cases:
         try:
             output = part2(**case["input"])
-            assert str(output) == str(
-                case["output"]
-            ), "case '{}', output: exp {}, got {}".format(
-                case["label"], case["output"], output
+            assert str(output) == str(case["output"]), (
+                "case '{}', output: exp {}, got {}".format(
+                    case["label"], case["output"], output
+                )
             )
         except Exception as e:
             assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(

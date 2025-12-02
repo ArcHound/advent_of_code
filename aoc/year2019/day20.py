@@ -42,8 +42,10 @@ def parse_data(in_data):
     portal_lines = {
         0: (0, 1),
         first_line_space - 3: (first_line_space, first_line_space + 1),
-        first_line_full_again
-        - 2: (first_line_full_again - 2, first_line_full_again - 1),
+        first_line_full_again - 2: (
+            first_line_full_again - 2,
+            first_line_full_again - 1,
+        ),
         len(data) - 5: (len(data) - 2, len(data) - 1),
     }
 

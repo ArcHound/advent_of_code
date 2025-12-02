@@ -179,10 +179,10 @@ def test_run_program():
                 )
             stdout = computer.get_list_output()
             if "stdout" in case:
-                assert (
-                    stdout == case["stdout"]
-                ), "case '{}', output: exp {}, got {}".format(
-                    case["label"], case["stdout"], stdout
+                assert stdout == case["stdout"], (
+                    "case '{}', output: exp {}, got {}".format(
+                        case["label"], case["stdout"], stdout
+                    )
                 )
         except Exception as e:
             assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(

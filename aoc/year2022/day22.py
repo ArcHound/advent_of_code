@@ -11,7 +11,6 @@ dir_pad = ">v<^"
 
 
 class Node:
-
     def __init__(self):
         self.up = None
         self.down = None

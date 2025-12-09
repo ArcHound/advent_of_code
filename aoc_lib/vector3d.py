@@ -50,4 +50,8 @@ def v_touches_squares(a):
     ]
 
 
+def distance(a: Point3d, b: Point3d):
+    return math.sqrt(pow(a[0] - b[0], 2) + pow(a[1] - b[1], 2) + pow(a[2] - b[2], 2))
+
+
 # def v_nearbycube(a,b):

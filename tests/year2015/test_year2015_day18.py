@@ -13,6 +13,7 @@ simple_test = """.#.#.#
 ####..
 """
 
+
 def test_part1():
     cases = [
         {
@@ -37,6 +38,7 @@ def test_part1():
             assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
                 case["label"], case["ex"], type(e)
             )
+
 
 def test_part2():
     cases = [

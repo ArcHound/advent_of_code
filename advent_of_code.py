@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader
 
 import aoc
-from aoc_tools.validators import validate_day, validate_year, validate_day_simple
+from aoc_tools.validators import validate_day, validate_year, validate_day_simple, get_last_day
 from aoc_tools.pathing import (
     make_dirs,
     get_solution_path,
@@ -165,7 +165,7 @@ def login(aoc_url, log_level):
     type=int,
     show_default=True,
     help="Day of the event",
-    callback=validate_day_simple,
+    callback=validate_day,
 )
 @click.option(
     "-w",
@@ -507,13 +507,13 @@ def solve(
     stars = aoc_svc.get_stars(year, day)
     stars_to_parts = {0: [1], 1: [2], 2: [1, 2]}
     parts = stars_to_parts[stars]
-    if day == 25:
+    if day == get_last_day(year):
         parts = [1, 2]
 
     for part in parts:
         try:
             log.info(f"Solving {year}, day {day}, part {part}...")
-            if part == 2 and day == 25:
+            if part == 2 and day == get_last_day(year):
                 output = 0
                 send_it = False
                 if autosubmit:

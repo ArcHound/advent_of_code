@@ -12,7 +12,7 @@ from aoc_tools import validators
 @patch(f"{validators.__name__}.datetime", wraps=datetime)
 def test_validate_day(mock_datetime):
     mock_datetime.datetime.now.return_value = datetime.datetime(
-        2019, 12, 5, 4, 59, 0, 0, datetime.UTC
+        2019, 12, 13, 4, 59, 0, 0, datetime.UTC
     )
     cases = [
         {
@@ -50,7 +50,17 @@ def test_validate_day(mock_datetime):
             "input": {
                 "ctx": MagicMock(params={"year": 2019}),
                 "param": "??",
-                "value": 5,
+                "value": 13,
+            },
+            "output": None,
+            "ex": BadParameter,
+        },
+        {
+            "label": "unlucky13",
+            "input": {
+                "ctx": MagicMock(params={"year": 2025}),
+                "param": "??",
+                "value": 13,
             },
             "output": None,
             "ex": BadParameter,

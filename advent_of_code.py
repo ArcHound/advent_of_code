@@ -15,7 +15,12 @@ from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader
 
 import aoc
-from aoc_tools.validators import validate_day, validate_year, validate_day_simple, get_last_day
+from aoc_tools.validators import (
+    validate_day,
+    validate_year,
+    validate_day_simple,
+    get_last_day,
+)
 from aoc_tools.pathing import (
     make_dirs,
     get_solution_path,

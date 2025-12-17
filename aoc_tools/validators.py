@@ -4,23 +4,28 @@ import logging
 
 log = logging.getLogger("aoc_logger")
 
+
 def days_in_year(year):
-    if year>=2015 and year<=2024:
+    if year >= 2015 and year <= 2024:
         return 25
     else:
         return 12
 
+
 def get_last_day(year):
     return days_in_year(year)
+
 
 def validate_day(ctx, param, value):
     # kinda also validates the year
     now = datetime.datetime.now()
     if value < 0:
         raise click.BadParameter("The day must be a positive integer")
-    if value <= days_in_year(ctx.params["year"]) and (ctx.params["year"] < now.year and ctx.params["year"] >= 2015):
+    if value <= days_in_year(ctx.params["year"]) and (
+        ctx.params["year"] < now.year and ctx.params["year"] >= 2015
+    ):
         return value
-    elif value>12 and days_in_year(ctx.params["year"])==12:
+    elif value > 12 and days_in_year(ctx.params["year"]) == 12:
         raise click.BadParameter(f"Sadly, since 2025 there are only 12 days :(")
     elif ctx.params["year"] == now.year:
         if value < now.day and now.month == 12:

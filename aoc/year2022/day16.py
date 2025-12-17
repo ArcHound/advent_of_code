@@ -155,7 +155,7 @@ def find_paths_under(g, weights, limit=30):
 
 
 def part1(in_data, test=False):
-    log.warn("WARNING! Takes more than an hour to run.")
+    log.warning("WARNING! Takes more than an hour to run.")
     g = parse_data(in_data)
     rate_dict = nx.get_node_attributes(g, "rate")
     # result = max_pressure_all_possibilities(g, rate_dict)

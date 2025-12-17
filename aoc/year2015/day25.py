@@ -23,3 +23,7 @@ def part1(in_data, test=False):
     index_of_point = diagonal_start + x
     log.debug(index_of_point)
     return (start * pow(mult, index_of_point - 1, mod)) % mod
+
+
+def part2(in_data, test=False):
+    return 0

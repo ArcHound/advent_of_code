@@ -97,6 +97,7 @@ def is_in_interval(x, pl):
 
 
 def part2(in_data, test=False):
+    log.warning("WARNING! Takes more than an hour to run!")
     data = parse_data(in_data)
     x_boundaries = list()
     y_boundaries = list()

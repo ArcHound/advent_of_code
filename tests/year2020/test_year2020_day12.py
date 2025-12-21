@@ -5,7 +5,11 @@ import pytest
 
 from aoc.year2020.day12 import part1, part2
 
-simple_test = """Lines
+simple_test = """F10
+N3
+F7
+R90
+F11
 """
 
 
@@ -17,7 +21,7 @@ def test_part1():
                 "in_data": simple_test,
                 "test": True,
             },
-            "output": "part1 output 2020-12",
+            "output": "25",
             "ex": None,
         },
     ]
@@ -43,7 +47,7 @@ def test_part2():
                 "in_data": simple_test,
                 "test": True,
             },
-            "output": "part2 output 2020-12",
+            "output": "286",
             "ex": None,
         },
     ]

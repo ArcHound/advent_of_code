@@ -123,4 +123,4 @@ def iterative_crt(l):
         new_n = c1[1] * c2[1]
         new_a = tuple_crt(c1, c2)  # if this throws, we throwing up
         worklist = sorted(worklist[2:] + [(new_a, new_n)], key=lambda x: x[1])
-    return worklist[0][0]
+    return worklist[0][0] % worklist[0][1]

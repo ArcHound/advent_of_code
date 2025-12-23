@@ -54,4 +54,14 @@ def distance(a: Point3d, b: Point3d):
     return math.sqrt(pow(a[0] - b[0], 2) + pow(a[1] - b[1], 2) + pow(a[2] - b[2], 2))
 
 
+def nearby_cubes(a: Point3d):
+    cubes = list()
+    for i in range(-1, 2, 1):
+        for j in range(-1, 2, 1):
+            for k in range(-1, 2, 1):
+                if (i, j, k) != (0, 0, 0):
+                    cubes.append(v_add(a, (i, j, k)))
+    return cubes
+
+
 # def v_nearbycube(a,b):

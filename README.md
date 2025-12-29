@@ -129,6 +129,7 @@ But the point of the advent of code is to code, so in most cases (graph algorith
  - `map2d`: class for working with grid-based 2d maps,
  - `vector2d, vector3d`: common math operations for 2d and 3d vectors,
  - `combinatorics`: selected algorithms,
+ - `num_theory`: EGCD, Chinese Remainder Theorem, Eratosthenes Sieve and couple others,
  - `interval`: whole number open-ended intervals,
  - `pixels`: draw image from set of pixels,
  - `intcode2019`: The intcode computer from year 2019 (this was so fun).

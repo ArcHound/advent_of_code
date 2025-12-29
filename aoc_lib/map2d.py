@@ -425,6 +425,19 @@ class Map2d:
         m = rm_j.rotate_counterclockwise()
         return m
 
+    def borders(self):
+        top = ""
+        bottom = ""
+        for i in range(self.bounds[0][0], self.bounds[1][0]):
+            top += self.get_point((i, self.bounds[0][1]))
+            bottom += self.get_point((i, self.bounds[1][1] - 1))
+        left = ""
+        right = ""
+        for i in range(self.bounds[0][1], self.bounds[1][1]):
+            left += self.get_point((self.bounds[0][0], i))
+            right += self.get_point((self.bounds[1][0] - 1, i))
+        return (top, bottom, left, right)
+
     def trim_edges(self):
         """Returns a new instance with only the "inner" data - lose two cols, two rows"""
         if (

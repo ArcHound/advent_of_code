@@ -301,6 +301,224 @@ def test_in_bounds_point():
             )
 
 
+def test_rotate_clockwise():
+    cases = [
+        {
+            "label": "simple",
+            "init": {
+                "obstacle_str": "..........#......#......#........................",
+                "bounds": ((0, 0), (7, 7)),
+            },
+            "output": """
+.......
+.......
+.......
+...###.
+.......
+.......
+.......
+""",
+            "ex": None,
+        },
+        {
+            "label": "simple_rect",
+            "init": {
+                "obstacle_str": "..........#......#......#..........",
+                "bounds": ((0, 0), (7, 5)),
+            },
+            "output": """
+.....
+.....
+.....
+.###.
+.....
+.....
+.....
+""",
+            "ex": None,
+        },
+    ]
+    for case in cases:
+        try:
+            obj = Map2d(**case["init"])
+            output = obj.rotate_clockwise()
+            assert output.debug_draw() == case["output"], (
+                "case '{}', output: exp {}, got {}".format(
+                    case["label"], case["output"], output
+                )
+            )
+        except Exception as e:
+            assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
+                case["label"], case["ex"], type(e)
+            )
+
+
+def test_flip_vertically():
+    cases = [
+        {
+            "label": "simple",
+            "init": {
+                "obstacle_str": "........#.......#.......#........................",
+                "bounds": ((0, 0), (7, 7)),
+            },
+            "output": """
+.......
+.....#.
+....#..
+...#...
+.......
+.......
+.......
+""",
+            "ex": None,
+        },
+    ]
+    for case in cases:
+        try:
+            obj = Map2d(**case["init"])
+            output = obj.flip_vertically()
+            assert output.debug_draw() == case["output"], (
+                "case '{}', output: exp {}, got {}".format(
+                    case["label"], case["output"], output
+                )
+            )
+        except Exception as e:
+            assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
+                case["label"], case["ex"], type(e)
+            )
+
+
+def test_join_maps_left_right():
+    cases = [
+        {
+            "label": "simple",
+            "init1": {
+                "obstacle_str": "...#.....#.#...#...#..#####..#...#..#...#.",
+                "bounds": ((0, 0), (7, 6)),
+            },
+            "init2": {
+                "obstacle_str": ".####...#...#..####...#...#..#...#..####..",
+                "bounds": ((0, 0), (7, 6)),
+            },
+            "output": """
+...#....####..
+..#.#...#...#.
+.#...#..####..
+.#####..#...#.
+.#...#..#...#.
+.#...#..####..
+""",
+            "ex": None,
+        },
+        {
+            "label": "incompatible_lenghts",
+            "init1": {
+                "obstacle_str": "...#.....#.#...#...#..#####..#...#..#...#........",
+                "bounds": ((0, 0), (7, 7)),
+            },
+            "init2": {
+                "obstacle_str": ".####...#...#..####...#...#..#...#..####..",
+                "bounds": ((0, 0), (7, 6)),
+            },
+            "output": """""",
+            "ex": ValueError,
+        },
+    ]
+    for case in cases:
+        try:
+            obj1 = Map2d(**case["init1"])
+            obj2 = Map2d(**case["init2"])
+            output = Map2d.join_maps_left_right(obj1, obj2)
+            assert output.debug_draw() == case["output"], (
+                "case '{}', output: exp {}, got {}".format(
+                    case["label"], case["output"], output
+                )
+            )
+        except Exception as e:
+            assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
+                case["label"], case["ex"], type(e)
+            )
+
+
+def test_join_maps_top_bottom():
+    cases = [
+        {
+            "label": "simple",
+            "init1": {
+                "obstacle_str": "...#.....#.#...#...#..#####..#...#..#...#........",
+                "bounds": ((0, 0), (7, 7)),
+            },
+            "init2": {
+                "obstacle_str": ".####...#...#..####...#...#..#...#..####..",
+                "bounds": ((0, 0), (7, 6)),
+            },
+            "output": """
+...#...
+..#.#..
+.#...#.
+.#####.
+.#...#.
+.#...#.
+.......
+.####..
+.#...#.
+.####..
+.#...#.
+.#...#.
+.####..
+""",
+            "ex": None,
+        },
+    ]
+    for case in cases:
+        try:
+            obj1 = Map2d(**case["init1"])
+            obj2 = Map2d(**case["init2"])
+            output = Map2d.join_maps_top_bottom(obj1, obj2)
+            assert output.debug_draw() == case["output"], (
+                "case '{}', output: exp {}, got {}".format(
+                    case["label"], case["output"], output
+                )
+            )
+        except Exception as e:
+            assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
+                case["label"], case["ex"], type(e)
+            )
+
+
+def test_trim_edges():
+    cases = [
+        {
+            "label": "simple",
+            "init": {
+                "obstacle_str": "..........#......#......#........................",
+                "bounds": ((0, 0), (7, 7)),
+            },
+            "output": """
+..#..
+..#..
+..#..
+.....
+.....
+""",
+            "ex": None,
+        },
+    ]
+    for case in cases:
+        try:
+            obj = Map2d(**case["init"])
+            output = obj.trim_edges()
+            assert output.debug_draw() == case["output"], (
+                "case '{}', output: exp {}, got {}".format(
+                    case["label"], case["output"], output
+                )
+            )
+        except Exception as e:
+            assert type(e) == case["ex"], "case '{}', ex: exp {}, got {}".format(
+                case["label"], case["ex"], type(e)
+            )
+
+
 def test_nearby_points():
     cases = [
         {

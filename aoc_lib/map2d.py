@@ -230,6 +230,43 @@ class Map2d:
         return index >= 0 and index < len(self.obstacle_str)
 
     ### --------------------------------------------------------------------------
+    ###     Rotation/Flipping Methods
+    ### --------------------------------------------------------------------------
+
+    def rotate_clockwise(self) -> Map2d:
+        """Return a new instance that is rotated 90 deg clockwise"""
+        lines = list()
+        for i in range(self.bounds[0][0], self.bounds[1][0]):
+            line = ""
+            for j in range(self.bounds[0][1], self.bounds[1][1]):
+                line = self.get_point((i, j)) + line
+            lines.append(line)
+        m = Map2d.from_lines("\n".join(lines), diagonal=self.diagonal)
+        return m
+
+    def rotate_counterclockwise(self) -> Map2d:
+        """Return a new instance that is rotated 90 deg counterclockwise"""
+        return self.rotate_clockwise().rotate_clockwise().rotate_clockwise()
+
+    def flip_vertically(self) -> Map2d:
+        """Return a new instance that is flipped vertically"""
+        lines = list()
+        for j in range(self.bounds[0][1], self.bounds[1][1]):
+            line = ""
+            for i in range(self.bounds[1][0] - 1, self.bounds[0][0] - 1, -1):
+                line += self.get_point((i, j))
+            lines.append(line)
+        m = Map2d.from_lines("\n".join(lines), diagonal=self.diagonal)
+        return m
+
+    def flip_horizontally(self) -> Map2d:
+        """Return a new instance that is flipped horizontally"""
+        m1 = self.rotate_clockwise()
+        m2 = m1.flip_vertically()
+        m3 = m2.rotate_counterclockwise()
+        return m3
+
+    ### --------------------------------------------------------------------------
     ###     Navigating Methods
     ### --------------------------------------------------------------------------
 
@@ -355,6 +392,54 @@ class Map2d:
             else:
                 new_obst_str += Map2d.obstacle_sym
         self.obstacle_str = new_obst_str
+
+    @classmethod
+    def join_maps_left_right(cls, map_a, map_b):
+        """Returns a new instance that is joined from two maps vertically - first on the left, second on the right. Throws value error if the lenghts differ."""
+        l_a = map_a.bounds[1][1] - map_a.bounds[0][1]
+        l_b = map_b.bounds[1][1] - map_b.bounds[0][1]
+        if l_a != l_b:
+            raise ValueError(f"Incompatible lenghts {l_a} and {l_b}")
+        l = l_a
+        a_start = map_a.bounds[0][1]
+        b_start = map_b.bounds[0][1]
+        lines = list()
+        for j in range(l):
+            line = ""
+            for i in range(map_a.bounds[0][0], map_a.bounds[1][0]):
+                line += map_a.get_point((i, a_start + j))
+            for i in range(map_b.bounds[0][0], map_b.bounds[1][0]):
+                line += map_b.get_point((i, b_start + j))
+            lines.append(line)
+        m = Map2d.from_lines(
+            "\n".join(lines), diagonal=map_a.diagonal or map_b.diagonal
+        )
+        return m
+
+    @classmethod
+    def join_maps_top_bottom(cls, map_a, map_b):
+        """Returns a new instance that is joined from two maps vertically - first on the left, second on the right. Throws value error if the lenghts differ."""
+        rm_a = map_a.rotate_clockwise()
+        rm_b = map_b.rotate_clockwise()
+        rm_j = Map2d.join_maps_left_right(rm_b, rm_a)
+        m = rm_j.rotate_counterclockwise()
+        return m
+
+    def trim_edges(self):
+        """Returns a new instance with only the "inner" data - lose two cols, two rows"""
+        if (
+            self.bounds[1][1] - self.bounds[0][1] < 2
+            or self.bounds[1][0] - self.bounds[0][0] < 2
+        ):
+            raise ValueError(f"Map bounds wouldn't leave any inner area {self.bounds}")
+        lines = list()
+        for j in range(self.bounds[0][1] + 1, self.bounds[1][1] - 1):
+            line = ""
+            for i in range(self.bounds[0][0] + 1, self.bounds[1][0] - 1):
+                line += self.get_point((i, j))
+            lines.append(line)
+        m = Map2d.from_lines("\n".join(lines), diagonal=self.diagonal)
+        return m
 
     def trace(
         self,

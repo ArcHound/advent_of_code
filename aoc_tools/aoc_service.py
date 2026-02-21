@@ -30,6 +30,7 @@ class AOC_Service:
         log.info("Init service session...")
         self.aoc_url = aoc_url
         self.aoc_session = requests.Session()
+        self.aoc_session.headers = {'User-Agent': 'https://github.com/ArcHound/advent_of_code by ArcHound'}
         self.aoc_session.cookies["session"] = aoc_token
         if proxy:
             log.info("Got proxy {} for service {}".format(proxies, "aoc"))

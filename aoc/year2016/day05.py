@@ -5,6 +5,7 @@ import hashlib
 import click
 from random import random
 from math import floor
+from time import sleep
 
 log = logging.getLogger("aoc_logger")
 
@@ -36,19 +37,93 @@ def print_scr(password, done=False):
     p_6 = password.get(6, chr(floor(random() * 90) + 32))
     p_7 = password.get(7, chr(floor(random() * 90) + 32))
 
-    click.secho(98 * "=", fg="green")
-    click.secho("|" + 96 * " " + "|", fg="green")
+    # AoC 2016:d5
+    # Decryptor
+    # https://www.dcode.fr/leet-speak-1337
+    # 40C 2016:D5
+    # D3CrYP70r
+    # https://manytools.org/hacker-tools/ascii-banner/
+    #
+    #  @@@  @@@  @@@@@@   @@@@@@@       @@@@@@   @@@@@@   @@@   @@@@@     @@@@@@@  @@@@@@@
+    #  @@!  @@@ @@!  @@@ !@@           @@   @@@ @@!  @@@  @@@ @@!@     @@ @@!  @@@ !@@
+    #  @!@!@!@! @!@  !@! !@!             .!!@!  @!@  !@!  !@! @!@!@!@     @!@  !@! !!@@!!
+    #       !!! !!:  !!! :!!            !!:     !!:  !!!  !!! !!:  !!! !! !!:  !!!     !:!
+    #       : :  : : ::   :: :: :      :.:: :::  : : ::   :    : : ::     :: :  :  :: : :
+    #
+    #  @@@@@@@  @@@@@@   @@@@@@@ @@@@@@@  @@@ @@@ @@@@@@@  @@@@@@@@  @@@@@@  @@@@@@@
+    #  @@!  @@@     @@! !@@      @@!  @@@ @@! !@@ @@!  @@@      @@! @@!  @@@ @@!  @@@
+    #  @!@  !@!  @!!!:  !@!      @!@!!@!   !@!@!  @!@@!@!      @!!  @!@  !@! @!@!!@!
+    #  !!:  !!!     !!: :!!      !!: :!!    !!:   !!:       .!!:    !!:  !!! !!: :!!
+    #  :: :  :  ::: ::   :: :: :  :   : :   .:     :       : :       : : ::   :   : :
+
+    click.echo(98 * " ")
+
     click.secho(
-        "|" + 30 * " " + "Advent of Code 2016, day 5 Decryptor" + 30 * " " + "|",
+        7 * " "
+        + "@@@  @@@  @@@@@@   @@@@@@@       @@@@@@   @@@@@@   @@@   @@@@@     @@@@@@@  @@@@@@@ "
+        + 7 * " ",
         fg="green",
     )
-    click.secho("|" + 96 * " " + "|", fg="green")
+    click.secho(
+        7 * " "
+        + "@@!  @@@ @@!  @@@ !@@           @@   @@@ @@!  @@@  @@@ @@!@     @@ @@!  @@@ !@@     "
+        + 7 * " ",
+        fg="green",
+    )
+    click.secho(
+        7 * " "
+        + "@!@!@!@! @!@  !@! !@!             .!!@!  @!@  !@!  !@! @!@!@!@     @!@  !@! !!@@!!  "
+        + 7 * " ",
+        fg="green",
+    )
+    click.secho(
+        7 * " "
+        + "     !!! !!:  !!! :!!            !!:     !!:  !!!  !!! !!:  !!! !! !!:  !!!     !:! "
+        + 7 * " ",
+        fg="green",
+    )
 
-    click.secho(98 * "=", fg="green")
+    click.secho(
+        7 * " "
+        + "     : :  : : ::   :: :: :      :.:: :::  : : ::   :    : : ::     :: :  :  :: : :  "
+        + 7 * " ",
+        fg="green",
+    )
     click.echo(98 * " ")
-    click.echo(98 * " ")
+    click.secho(
+        7 * " "
+        + "@@@@@@@  @@@@@@   @@@@@@@ @@@@@@@  @@@ @@@ @@@@@@@  @@@@@@@@  @@@@@@  @@@@@@@       "
+        + 7 * " ",
+        fg="green",
+    )
+    click.secho(
+        7 * " "
+        + "@@!  @@@     @@! !@@      @@!  @@@ @@! !@@ @@!  @@@      @@! @@!  @@@ @@!  @@@      "
+        + 7 * " ",
+        fg="green",
+    )
+
+    click.secho(
+        7 * " "
+        + "@!@  !@!  @!!!:  !@!      @!@!!@!   !@!@!  @!@@!@!      @!!  @!@  !@! @!@!!@!       "
+        + 7 * " ",
+        fg="green",
+    )
+    click.secho(
+        7 * " "
+        + "!!:  !!!     !!: :!!      !!: :!!    !!:   !!:       .!!:    !!:  !!! !!: :!!       "
+        + 7 * " ",
+        fg="green",
+    )
+    click.secho(
+        7 * " "
+        + ":: :  :  ::: ::   :: :: :  :   : :   .:     :       : :       : : ::   :   : :      "
+        + 7 * " ",
+        fg="green",
+    )
     click.echo(98 * " ")
 
+    click.echo(98 * " ")
     if not done:
         click.secho(
             41 * " " + "!! DECRYPTING !!" + 42 * " ", fg="red", blink=True, bold=True
@@ -58,30 +133,18 @@ def print_scr(password, done=False):
             41 * " " + "!! SUCCESSFUL !!" + 42 * " ", fg="green", blink=True, bold=True
         )
     click.echo(98 * " ")
-    click.echo(98 * " ")
     # click.echo(98*' ')
 
-    click.echo(98 * " ")
     click.secho(
         41 * " " + f"{p_0} {p_1} {p_2} {p_3} {p_4} {p_5} {p_6} {p_7} " + 41 * " ",
         fg="blue",
         bold=True,
     )
     click.echo(98 * " ")
-    # click.echo(98*' ')
-
     click.echo(98 * " ")
-    if not done:
-        click.echo(98 * " ")
+    click.secho(38 * " " + "(c) 2026 Miloslav Homer " + 38 * " ", fg="green")
     click.echo(98 * " ")
-    click.secho(98 * "=", fg="green")
-
-    click.secho("|" + 96 * " " + "|", fg="green")
-    click.secho(
-        "|" + 36 * " " + "(c) 2026 Miloslav Homer " + 36 * " " + "|", fg="green"
-    )
-    click.secho("|" + 96 * " " + "|", fg="green")
-    click.secho(98 * "=", fg="green")
+    click.echo(98 * " ")
 
 
 def part2(in_data, test=False):
@@ -105,4 +168,5 @@ def part2(in_data, test=False):
     for i in range(8):
         final_pass += password[i]
     print_scr(password, True)
+    sleep(4)
     return final_pass

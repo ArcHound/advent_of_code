@@ -146,6 +146,16 @@ def test_translate_point():
             "ex": None,
         },
         {
+            "label": "oob",
+            "init": {
+                "obstacle_str": ".........#......#......#............",
+                "bounds": ((0, 0), (9, 4)),
+            },
+            "input": {"point": (9, 6)},
+            "output": None,
+            "ex": ValueError,
+        },
+        {
             "label": "rectangle++",
             "init": {
                 "obstacle_str": ".........#......#......#............",
@@ -190,6 +200,16 @@ def test_translate_index():
             "input": {"index": 20},
             "output": (2, 2),
             "ex": None,
+        },
+        {
+            "label": "oob",
+            "init": {
+                "obstacle_str": ".........#......#......#............",
+                "bounds": ((0, 0), (9, 4)),
+            },
+            "input": {"index": 36},
+            "output": None,
+            "ex": ValueError,
         },
         {
             "label": "rectangle++",

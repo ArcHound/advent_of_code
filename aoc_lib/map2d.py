@@ -175,11 +175,17 @@ class Map2d:
     ### --------------------------------------------------------------------------
 
     def translate_point(self, point: Tuple[int, int]) -> int:
-        """returns index corresponding to that point (no safety checks)"""
+        """returns index corresponding to that point"""
+        if not self.in_bounds_point(point):
+            raise ValueError(f"Point {point} not in bounds {self.bounds}")
         return (point[1] - self.minimal[1]) * self.x_len + (point[0] - self.minimal[0])
 
     def translate_index(self, index: int) -> Tuple[int, int]:
-        """returns point corresponding to that index (no safety checks)"""
+        """returns point corresponding to that index"""
+        if not self.in_bounds_index(index):
+            raise ValueError(
+                f"Index {index} not between 0 and {len(self.obstacle_str)}"
+            )
         return (
             index % self.x_len + self.minimal[0],
             index // self.x_len + self.minimal[1],

@@ -3,7 +3,7 @@
 
 import pytest
 
-from aoc.year2020.day25 import part1, part2
+from aoc.year2020.day25 import part1
 
 simple_test = """5764801
 17807724

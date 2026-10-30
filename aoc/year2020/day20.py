@@ -119,8 +119,8 @@ def part2(in_data, test=False):
     log.debug(first_col_i)
     rows = list()
     row_is = list()
-    log.debug(data[2473])
-    log.debug(data[1543])
+    # log.debug(data[2473])
+    # log.debug(data[1543])
     for i in range(len(first_col)):
         index = first_col_i[i]
         iter_map = first_col[i]

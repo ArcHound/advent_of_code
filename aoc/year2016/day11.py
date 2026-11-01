@@ -3,6 +3,7 @@
 import logging
 import dataclasses
 from collections import defaultdict, deque
+from aoc_lib.functional import bfs
 
 log = logging.getLogger("aoc_logger")
 
@@ -38,7 +39,8 @@ def parse_data(in_data):
     return tuple(floors)
 
 
-def is_done(floors):
+def is_done(position):
+    floors, elevator = position
     return all([len(floors[i]) == 0 for i in range(len(floors) - 1)])
 
 
@@ -60,8 +62,9 @@ def is_floor_legal(floor):
     )
 
 
-def legal_moves(floors, elevator):
-    if is_done(floors):
+def legal_moves(position):
+    floors, elevator = position
+    if is_done(position):
         return list()
     if len(floors[elevator]) == 0:
         return list()
@@ -99,43 +102,21 @@ def legal_moves(floors, elevator):
     normalized = list()
     for nft, move in legal_moves:
         new_floors = tuple(["".join(sorted([x for x in f])) for f in nft])
-        normalized.append((new_floors, move))
+        normalized.append(((new_floors, move), 1))
     return normalized
-
-
-def bfs(floors, elevator):
-    for floor in floors:
-        assert is_floor_legal(floor)
-    queue = deque([(floors, elevator, 0)])
-    seen = {(floors, elevator)}
-    minimum = -1
-    while len(queue) > 0:
-        f, e, s = queue.popleft()
-        if is_done(f):
-            if minimum == -1 or s < minimum:
-                minimum = s
-                break
-        moves = legal_moves(f, e)
-        for nf, ne in moves:
-            if (nf, ne) not in seen:
-                seen.add((nf, ne))
-                queue.append((nf, ne, s + 1))
-    return minimum
 
 
 def part1(in_data, test=False):
     floors = parse_data(in_data)
-    log.debug(floors)
-    log.debug(is_done(floors))
     elevator = 0  # starting floor
-    return bfs(floors, elevator)
+    return bfs((floors, elevator), is_done, legal_moves)
 
 
 def part2(in_data, test=False):
     floors = list(parse_data(in_data))
     elevator = 0
     log.info("start")
-    og = bfs(tuple(floors), elevator)
+    og = bfs((tuple(floors), elevator), is_done, legal_moves)
     log.info(og)
     # ok, so there are two ideas.
     # one was to transfer the next two boxes after doing the original shuffle to add the steps
@@ -152,6 +133,6 @@ def part2(in_data, test=False):
     nf = floors[0].replace(c.upper(), "")
     nf = nf.replace(c.lower(), "")
     floors[0] = nf
-    add_on = bfs(tuple(floors), elevator)
+    add_on = bfs((tuple(floors), elevator), is_done, legal_moves)
     log.info("done")
     return og + (og - add_on) * 2

@@ -132,6 +132,8 @@ But the point of the advent of code is to code, so in most cases (graph algorith
  - `num_theory`: EGCD, Chinese Remainder Theorem, Eratosthenes Sieve and couple others,
  - `interval`: whole number open-ended intervals,
  - `pixels`: draw image from set of pixels,
+ - `functional`: generic flows. So far only BFS.
+ - `assembunny`: The assembunny computer from year 2016.
  - `intcode2019`: The intcode computer from year 2019 (this was so fun).
 
 An incomplete test suite can be found at `./tests/aoc_lib/`. 

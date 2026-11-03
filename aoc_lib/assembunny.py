@@ -18,6 +18,7 @@ class AssemBunny:
         self.registers["b"] = b
         self.registers["c"] = c
         self.registers["d"] = d
+        self.stdout = list()
 
     def get_register(self, x):
         if x not in "abcd":
@@ -37,10 +38,16 @@ class AssemBunny:
         else:
             return int(a)
 
-    def run_program(self, program_data):
+    def read_stdout(self):
+        return self.stdout
+
+    def run_program(self, program_data, stdout_limit=-1):
+        self.stdout = list()
         program = deepcopy(program_data)
         ip = 0
         while ip < len(program):
+            if stdout_limit != -1 and len(self.stdout) == stdout_limit:
+                break
             log.debug(ip)
             log.debug(program)
             log.debug(self.registers)
@@ -56,6 +63,10 @@ class AssemBunny:
                     ip += 1
                     continue
                 self.registers[inst[1]] -= 1
+                ip += 1
+            elif inst[0] == "out":
+                v = self.register_or_const(inst[1])
+                self.stdout.append(v)
                 ip += 1
             elif inst[0] == "cpy":
                 if inst[2] not in "abcd":
